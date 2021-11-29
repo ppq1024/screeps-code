@@ -1,0 +1,7 @@
+dist/
+temp/
+node_modules/
+
+# include some private message
+# but you can see a template in template.secret.json
+.secret.json
