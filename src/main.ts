@@ -20,10 +20,8 @@ import { controller } from './creep/controllor';
 import { spawner } from './creep/spawner';
 
 function loopUnit() {
-   spawner.run();
-   controller.run();
+    spawner.run();
+    controller.run();
 }
- 
- 
+
 export const loop = errorMapper(loopUnit);
-// export const loop = loopUnit;

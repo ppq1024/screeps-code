@@ -7,10 +7,12 @@
     "rollup": "^2.60.1",
     "rollup-plugin-clear": "^2.0.7",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-screeps": "^1.0.1"
+    "rollup-plugin-screeps": "^1.0.1",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "typescript": "^4.5.2"
   },
   "scripts": {
-    "push": "rollup -cw --environment DEST:main",
+    "push": "rollup -c --environment DEST:main",
     "local": "rollup -cw --environment DEST:local",
     "build": "rollup -c"
   },
