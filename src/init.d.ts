@@ -15,16 +15,20 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { errorMapper } from '@/modules/errorMapper';
-import { controller } from '@/creep/controllor';
-import { spawner } from '@/creep/spawner';
-import { tower } from './tower';
-
-
-function loopUnit() {
-    tower.run();
-    spawner.run();
-    controller.run();
+interface CreepMemory {
+    role?: string
 }
 
-export const loop = errorMapper(loopUnit);
+interface Team {
+    [role: string]: Creep[]
+}
+
+interface Task {
+    name: string,
+}
+
+interface WorkerTask extends Task {
+    name: string,
+    source: Source | Mineral | Deposit | Structure,
+    target: Structure | ConstructionSite | Creep
+}

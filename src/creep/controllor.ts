@@ -15,16 +15,19 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { errorMapper } from '@/modules/errorMapper';
-import { controller } from '@/creep/controllor';
-import { spawner } from '@/creep/spawner';
-import { tower } from './tower';
+import { builder } from "@/creep/role/builder";
+import { harvester } from "@/creep/role/harvester";
 
 
-function loopUnit() {
-    tower.run();
-    spawner.run();
-    controller.run();
-}
 
-export const loop = errorMapper(loopUnit);
+export const controller = {
+    run: function () {
+        for (var name in Game.creeps) {
+            var creep = Game.creeps[name];
+            switch (creep.memory['role']) {
+                case 'harvester': harvester.run(creep); break;
+                case 'builder': builder.run(creep); break;
+            }
+        }
+    }
+};
