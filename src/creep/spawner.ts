@@ -15,13 +15,16 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var worker_300 = [WORK, CARRY, CARRY, MOVE, MOVE];
-var worker_500 = [WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
-var worker_800 = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+var worker_unit = [WORK, CARRY, MOVE];
+var carrier_unit = [CARRY, CARRY, MOVE];
 
-function spawn(spawner: StructureSpawn, worker: BodyPartConstant[], roleName: string): ScreepsReturnCode {
+function spawn(spawner: StructureSpawn, unit: BodyPartConstant[], unit_count: number, roleName: string): ScreepsReturnCode {
     var newName = roleName + Game.time;
-    var result = spawner.spawnCreep(worker, newName, { memory: { role: roleName } });
+    var creep = [];
+    for (var i = 0; i < unit_count; i++) {
+        creep.push(...unit);
+    }
+    var result = spawner.spawnCreep(creep, newName, { memory: { role: roleName } });
     if (result != OK) {
         console.log('failed to create ' + roleName + ' with error code: ' + result);
         return result;
@@ -46,19 +49,32 @@ export const spawner = {
 
         var worker_count: {[name: string]: number} = {
             'harvester': 0,
-            'builder': 0,
+            'carrier': 0,
+            'builder': 0
         };
         _.forEach(Game.creeps, (creep) => {
             worker_count[creep.memory.role]++
         });
 
-        var worker = worker_800;
-
+        var roleName;
+        var unit;
+        var count = 4;
         if (worker_count['harvester'] < 2) {
-            spawn(spawner, worker, 'harvester');
+            roleName = 'harvester';
+            unit = worker_unit;
         }
-        else if (worker_count['builder'] < 1) {
-            spawn(spawner, worker, 'builder');
+        else if (worker_count['carrier'] < 2) {
+            roleName = 'carrier';
+            unit = carrier_unit;
+            count = 2;
+        }
+        else if (worker_count['builder'] < 2) {
+            roleName = 'builder';
+            unit = worker_unit;
+        }
+
+        if (roleName) {
+            spawn(spawner, unit, count, roleName);
         }
     }
 };

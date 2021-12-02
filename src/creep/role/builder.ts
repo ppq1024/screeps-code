@@ -16,7 +16,7 @@
  */
 
 export const builder = {
-    run: function (creep) {
+    run: function (creep: Creep) {
 
         if (creep.memory['building'] && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory['building'] = false;
@@ -26,10 +26,10 @@ export const builder = {
         }
 
         if (creep.memory['building']) {
-            var targets = Game.rooms[Memory['home']].find(FIND_CONSTRUCTION_SITES);
-            if (targets.length) {
-                if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
+            var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+            if (target && target.structureType != STRUCTURE_ROAD) {
+                if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
                 }
                 return;
             }
@@ -41,16 +41,16 @@ export const builder = {
             return;
         }
         
-        var targets = Game.rooms[Memory['home']].find(FIND_STRUCTURES, {
+        var source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (structure) => {
                 return structure.structureType == STRUCTURE_CONTAINER &&
                     structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
             }
         });
-        if (targets.length > 0) {
-            var result = creep.withdraw(targets[0], RESOURCE_ENERGY);
+        if (source) {
+            var result = creep.withdraw(source, RESOURCE_ENERGY);
             if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(targets[0]);
+                creep.moveTo(source);
             }
         }
         else {
