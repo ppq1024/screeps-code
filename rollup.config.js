@@ -4,6 +4,7 @@ import copy from 'rollup-plugin-copy'
 import typescript from 'rollup-plugin-typescript2' 
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import cleanup from 'rollup-plugin-cleanup';
 
 let config
 if (!process.env.DEST) console.log("未指定目标, 代码将被编译但不会上传")
@@ -41,7 +42,8 @@ export default {
         clear({ targets: ["dist"] }),
         resolve(),
         commonjs(),
-        typescript({ tsconfig: "./tsconfig.json" }), 
+        typescript({ tsconfig: "./tsconfig.json" }),
+        cleanup({comments: 'none', extensions: ['js', 'ts']}),
         pluginDeploy
     ]
 };
