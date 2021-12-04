@@ -15,23 +15,10 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { builder } from "@/creep/role/builder";
-import { harvester } from "@/creep/role/harvester";
-import { carrier } from "@/creep/role/carrier";
-import { repairer } from "@/creep/role/repairer";
-
-// hash表可比if-else和switch-case效率高多了
-// 但不太确定内存占用的问题
-// 因为对JS底层不太熟
-var roleFunctions = {
-    harvester: harvester.run,
-    carrier: carrier.run,
-    builder: builder.run,
-    repairer: repairer.run
+export const functions = {
+    getTarget: (target: StructureTarget) => target.type == STRUCTURE_STORAGE ?
+        Game.rooms[target.description].storage :
+        Game.getObjectById<AnyStoreStructure>(target.description),
+    
+    
 }
-
-export const controller = {
-    run: function () {
-        _.filter(Game.creeps, (creep) => creep.memory.controlled).forEach((creep) => roleFunctions[creep.memory.role](creep));
-    }
-};

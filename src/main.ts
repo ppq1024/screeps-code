@@ -18,12 +18,12 @@
 import { errorMapper } from '@/modules/errorMapper';
 import { controller } from '@/creep/controllor';
 import { spawner } from '@/creep/spawner';
-import { tower } from './tower';
+import { tower } from '@/tower';
 
 
 function loopUnit() {
     tower.run();
-    spawner.run();
+    spawner.run(Game.spawns['DEFAULT_SPAWN']);
     controller.run();
 }
 

@@ -15,8 +15,30 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+interface Creep {
+    doTask: () => ScreepsReturnCode | void
+}
+
 interface CreepMemory {
-    role?: string
+    role: string
+    controlled: boolean,
+    task?: Task,
+    station?: string,
+    body?: BodyUnit[]
+    respawn?: boolean
+}
+
+interface RoomMemory {
+    sources: Source[]
+}
+
+interface SpawnMemory {
+    queue: string[]
+}
+
+interface Memory {
+    home: string,
+    staticTask: { [name: string]: Task }
 }
 
 interface Team {
@@ -25,10 +47,39 @@ interface Team {
 
 interface Task {
     name: string,
+    static: boolean,
+    roleLimit: string
+}
+
+interface CarrierTask extends Task {
+    roleLimit: 'carrier',
+    from?: StructureTarget,
+    to?: StructureTarget,
+    defaultPath?: {
+        from: PathStep[],
+        to: PathStep[]
+    }
+}
+
+interface HarvesterTask extends Task {
+    roleLimit: 'harvester',
+    flag: string,
+    sourceID: string,
+    target: StructureTarget
+}
+
+interface StructureTarget {
+    type: StructureConstant,
+    description: string
 }
 
 interface WorkerTask extends Task {
     name: string,
     source: Source | Mineral | Deposit | Structure,
     target: Structure | ConstructionSite | Creep
+}
+
+interface BodyUnit {
+    unit: BodyPartConstant[],
+    repeat: number
 }

@@ -15,27 +15,35 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const builder = {
-    run: function (creep: Creep) {
-
-        if (creep.memory['building'] && creep.store.energy == 0) {
-            creep.memory['building'] = false;
+export const repairer = {
+    run: function(creep: Creep) {
+        if (creep.memory['repairing'] && creep.store.energy == 0) {
+            creep.memory['repairing'] = false;
         }
-        if (!creep.memory['building'] && creep.store.getFreeCapacity() == 0) {
-            creep.memory['building'] = true;
+        if (!creep.memory['repairing'] && creep.store.getFreeCapacity() == 0) {
+            creep.memory['repairing'] = true;
         }
 
-        if (creep.memory['building']) {
-            var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+        if (Game.time % 128 == 0 || !creep.memory['targetID']) {
+            var targets = creep.room.find(FIND_STRUCTURES, {
+                filter: (structure) => structure.structureType == STRUCTURE_WALL && structure.hits < 30000000 || // 30M
+                        structure.structureType == STRUCTURE_RAMPART && structure.hits < structure.hitsMax
+
+            });
+
+            var hitsMin = targets[0];
+            targets.forEach((wall) => hitsMin = hitsMin.hits < wall.hits ? hitsMin : wall);
+            creep.memory['targetID'] = hitsMin.id;
+        }
+
+        if (creep.memory['repairing']) {
+            var target = Game.getObjectById<StructureRampart | StructureWall>(creep.memory['targetID']);
+
             if (target) {
-                if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                if (creep.pos.getRangeTo(target) > 3) {
                     creep.moveTo(target);
                 }
-                return;
-            }
-
-            if (creep.upgradeController(Game.rooms[Memory['home']].controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(Game.rooms[Memory['home']].controller);
+                creep.repair(target);
             }
 
             return;
@@ -62,13 +70,6 @@ export const builder = {
                 creep.moveTo(container);
             }
             return;
-        }
-
-        var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-        if (source) {
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-            }
         }
     }
 }
