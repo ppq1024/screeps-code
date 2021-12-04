@@ -20,7 +20,9 @@ export const tower = {
         var tower = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_TOWER);
         tower.forEach((tower: StructureTower) => {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => structure.hits < (structure.structureType == STRUCTURE_WALL ? 260000 : structure.hitsMax)
+                filter: (structure) => structure.hits <
+                    (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART ?
+                        10000 : structure.hitsMax)
             });
             if(closestDamagedStructure) {
                 tower.repair(closestDamagedStructure);
