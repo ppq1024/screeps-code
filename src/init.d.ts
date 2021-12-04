@@ -33,6 +33,7 @@ interface RoomMemory {
 }
 
 interface SpawnMemory {
+    priorQueue: string[],
     queue: string[]
 }
 

@@ -15,10 +15,6 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var worker_unit = [WORK, CARRY, MOVE];
-var harvester_full = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE]
-var carrier_unit = [CARRY, CARRY, MOVE];
-
 var expand = (bodyUnit: BodyUnit, dest?: BodyPartConstant[]) => {
     dest = dest ? dest : [];
     for (var i = 0; i < bodyUnit.repeat; i++) {
@@ -33,31 +29,48 @@ var parseBody = (body: BodyUnit[]) => {
     return result;
 }
 
+var spawnQueue = (spawner: StructureSpawn, queue: string[]) => {
+    var name = queue[0];
+    if (!name) {
+        return false;
+    }
+
+    var body = parseBody(Memory.creeps[name].body);
+    if (spawner.spawnCreep(body, name, {dryRun: true}) == OK) {
+        spawner.spawnCreep(body, name);
+        Memory.creeps[name].respawn = false;
+        queue.shift();
+        console.log('Respawned creep:', name);
+        return true;
+    }
+
+    return false;
+}
+
 export const spawner = {
     run: function (spawner: StructureSpawn) {
         _.forEach(Memory.creeps, (creep_memory, name) => {
             if (!Game.creeps[name] && !creep_memory.respawn) {
-                spawner.memory.queue.push(name);
+                if (creep_memory['important']) {
+                    spawner.memory.priorQueue.push(name);
+                }
+                else {
+                    spawner.memory.queue.push(name);
+                }
                 creep_memory.respawn = true;
                 delete creep_memory.station;
                 console.log('Prepare to respawn creep:', name);
             }
         });
 
-        var name = spawner.memory.queue[0];
-        if (!name || spawner.spawning) {
+        if (spawner.spawning) {
             return;
         }
 
-        var body = parseBody(Memory.creeps[name].body);
-        if (spawner.spawnCreep(body, name, {dryRun: true}) == OK) {
-            var result = spawner.spawnCreep(body, name);
-            if (result == OK) {
-                Memory.creeps[name].respawn = false;
-                spawner.memory.queue.shift();
-                console.log('Respawned creep:', name);
-                return;
-            }
+        if (spawnQueue(spawner, spawner.memory.priorQueue)) {
+            return;
         }
+
+        spawnQueue(spawner, spawner.memory.queue);
     }
 };
