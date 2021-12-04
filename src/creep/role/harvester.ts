@@ -15,38 +15,43 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+ import { functions } from "@/creep/functions";
+
 export const harvester = {
     run: function (creep: Creep) {
-        if (creep.store.getFreeCapacity() > 0) {
-            var sourceID = creep.memory['source'];
-            if (!sourceID) {
-                var sources: any[] = Memory['source'];
-                var sourceMessage = sources.find((source) => {
-                    var harvester = source.harvester;
-                    return !harvester || !Game.creeps[harvester];
-                });
-                sourceMessage.harvester = creep.name;
-                creep.memory['source'] = sourceMessage.id;
-                sourceID = sourceMessage.id;
+        if (creep.spawning) {
+            return;
+        }
+
+        var task = <HarvesterTask> creep.memory.task;
+        if (task) {
+            if (task.static) {
+                task = <HarvesterTask> Memory.staticTask[task.name];
             }
 
-            var source = Game.getObjectById<Source>(creep.memory['source']);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+            var source = Game.getObjectById<Source>(task.sourceID);
+            var target = functions.getTarget(task.target);
+            var flag = Game.flags[task.flag];
+
+            if (creep.pos.getRangeTo(flag) > 0) {
+                creep.moveTo(flag);
+            }
+
+            var result: ScreepsReturnCode;
+            if (creep.store.getFreeCapacity() == 0) {
+                result = creep.transfer(target, RESOURCE_ENERGY);
+                if (result != OK && result != ERR_NOT_IN_RANGE) {
+                    console.log('Cannot give energy with error code:', result);
+                }
+            }
+
+            result = creep.harvest(source);
+            if (result != OK && result != ERR_NOT_IN_RANGE) {
+                console.log('Cannot harvest energy with error code:', result);
             }
             return;
         }
 
-        var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-            }
-        });
-        if (target) {
-            if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-        }
+        console.log('No task:', creep.name);
     }
 }

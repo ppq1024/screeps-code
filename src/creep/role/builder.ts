@@ -18,7 +18,7 @@
 export const builder = {
     run: function (creep: Creep) {
 
-        if (creep.memory['building'] && creep.store[RESOURCE_ENERGY] == 0) {
+        if (creep.memory['building'] && creep.store.energy == 0) {
             creep.memory['building'] = false;
         }
         if (!creep.memory['building'] && creep.store.getFreeCapacity() == 0) {
@@ -27,7 +27,7 @@ export const builder = {
 
         if (creep.memory['building']) {
             var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-            if (target && target.structureType != STRUCTURE_ROAD) {
+            if (target) {
                 if (creep.build(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 }
@@ -40,23 +40,34 @@ export const builder = {
 
             return;
         }
+
+        var store = Game.rooms[Memory['home']].storage;
+        if (store && store.store.energy > 0) {
+            var result = creep.withdraw(store, RESOURCE_ENERGY);
+            if (result == ERR_NOT_IN_RANGE) {
+                creep.moveTo(store);
+            }
+            return;
+        }
         
-        var source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (structure) => {
                 return structure.structureType == STRUCTURE_CONTAINER &&
                     structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
             }
         });
-        if (source) {
-            var result = creep.withdraw(source, RESOURCE_ENERGY);
+        if (container) {
+            var result = creep.withdraw(container, RESOURCE_ENERGY);
             if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+                creep.moveTo(container);
             }
+            return;
         }
-        else {
-            var sources = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-            if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources);
+
+        var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+        if (source) {
+            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source);
             }
         }
     }

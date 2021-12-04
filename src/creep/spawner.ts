@@ -16,6 +16,7 @@
  */
 
 var worker_unit = [WORK, CARRY, MOVE];
+var harvester_full = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE]
 var carrier_unit = [CARRY, CARRY, MOVE];
 
 function spawn(spawner: StructureSpawn, unit: BodyPartConstant[], unit_count: number, roleName: string): ScreepsReturnCode {
@@ -24,7 +25,7 @@ function spawn(spawner: StructureSpawn, unit: BodyPartConstant[], unit_count: nu
     for (var i = 0; i < unit_count; i++) {
         creep.push(...unit);
     }
-    var result = spawner.spawnCreep(creep, newName, { memory: { role: roleName } });
+    var result = spawner.spawnCreep(creep, newName, { memory: { role: roleName, controlled: true } });
     if (result != OK) {
         console.log('failed to create ' + roleName + ' with error code: ' + result);
         return result;
@@ -34,47 +35,60 @@ function spawn(spawner: StructureSpawn, unit: BodyPartConstant[], unit_count: nu
 }
 
 export const spawner = {
-    run: function () {
-        for (var name in Memory.creeps) {
-            if (!Game.creeps[name]) {
-                delete Memory.creeps[name];
-                console.log('Clearing non-existing creep memory:', name);
+    run: function (spawner: StructureSpawn) {
+        _.forEach(Memory.creeps, (creep_memory, name) => {
+            if (!Game.creeps[name] && !creep_memory.respawn) {
+                spawner.memory.queue.push(name);
+                creep_memory.respawn = true;
+                console.log('Prepare to respawn creep:', name);
             }
-        }
+        });
 
-        var spawner = Game.spawns['DEFAULT_SPAWN'];
-        if (spawner.spawning) {
+        var name = spawner.memory.queue[0];
+        if (!name || spawner.spawning || spawner.spawnCreep(Memory.creeps[name].body, name, {dryRun: true}) != OK) {
+            return;
+        }
+        spawner.memory.queue.pop();
+
+        var result = spawner.spawnCreep(Memory.creeps[name].body, name);
+
+        if (result == OK) {
+            Memory.creeps[name].respawn = false;
+            console.log('Respawned creep:', name);
             return;
         }
 
-        var worker_count: {[name: string]: number} = {
-            'harvester': 0,
-            'carrier': 0,
-            'builder': 0
-        };
-        _.forEach(Game.creeps, (creep) => {
-            worker_count[creep.memory.role]++
-        });
+        console.log('Cannot spawn creep %s with error code: %d', name, result);
 
-        var roleName;
-        var unit;
-        var count = 4;
-        if (worker_count['harvester'] < 2) {
-            roleName = 'harvester';
-            unit = worker_unit;
-        }
-        else if (worker_count['carrier'] < 2) {
-            roleName = 'carrier';
-            unit = carrier_unit;
-            count = 2;
-        }
-        else if (worker_count['builder'] < 2) {
-            roleName = 'builder';
-            unit = worker_unit;
-        }
+        // var worker_count: {[name: string]: number} = {
+        //     'harvester': 0,
+        //     'carrier': 0,
+        //     'builder': 0
+        // };
+        // _.forEach(Game.creeps, (creep) => {
+        //     worker_count[creep.memory.role]++
+        // });
 
-        if (roleName) {
-            spawn(spawner, unit, count, roleName);
-        }
+        // var roleName;
+        // var unit;
+        // var count = 4;
+        // if (worker_count['harvester'] < 2) {
+        //     roleName = 'harvester';
+        //     unit = harvester_full;
+        //     count = 1;
+        // }
+        // else if (worker_count['carrier'] < 2) {
+        //     roleName = 'carrier';
+        //     unit = carrier_unit;
+        //     count = 2;
+        // }
+        // else if (worker_count['builder'] < 2) {
+        //     roleName = 'builder';
+        //     unit = worker_unit;
+        // }
+
+        // if (roleName) {
+        //     spawn(spawner, unit, count, roleName);
+        // }
     }
 };

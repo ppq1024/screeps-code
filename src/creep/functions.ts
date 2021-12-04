@@ -15,16 +15,10 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { errorMapper } from '@/modules/errorMapper';
-import { controller } from '@/creep/controllor';
-import { spawner } from '@/creep/spawner';
-import { tower } from '@/tower';
-
-
-function loopUnit() {
-    tower.run();
-    spawner.run(Game.spawns['DEFAULT_SPAWN']);
-    controller.run();
+export const functions = {
+    getTarget: (target: StructureTarget) => target.type == STRUCTURE_STORAGE ?
+        Game.rooms[target.description].storage :
+        Game.getObjectById<AnyStoreStructure>(target.description),
+    
+    
 }
-
-export const loop = errorMapper(loopUnit);

@@ -19,17 +19,14 @@ import { builder } from "@/creep/role/builder";
 import { harvester } from "@/creep/role/harvester";
 import { carrier } from "@/creep/role/carrier";
 
-
-
 export const controller = {
     run: function () {
-        for (var name in Game.creeps) {
-            var creep = Game.creeps[name];
+        _.filter(Game.creeps, (creep) => creep.memory.controlled).forEach((creep) => {
             switch (creep.memory['role']) {
                 case 'harvester': harvester.run(creep); break;
                 case 'builder': builder.run(creep); break;
                 case 'carrier': carrier.run(creep); break;
             }
-        }
+        });
     }
 };
