@@ -80,9 +80,31 @@ export const harvester = {
             }  
         }
 
-        var sources = creep.room.find(FIND_SOURCES_ACTIVE);
-        if (sources) {
-            source = sources[0];
+        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+            var target = Game.getObjectById<AnyStoreStructure>(creep.memory['targetID']);
+            if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure) => (structure.structureType == STRUCTURE_EXTENSION ||
+                            structure.structureType == STRUCTURE_SPAWN ||
+                            structure.structureType == STRUCTURE_TOWER) &&
+                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                });
+                if (target) {
+                    creep.memory['targetID'] = target.id;
+                }
+            }
+
+            return;
         }
+
+        var source = Game.getObjectById<Source>(creep.memory['sourceID']);
+        if (!source) {
+            source = creep.pos.findClosestByPath(FIND_SOURCES);
+            creep.memory['sourceID'] = source.id;
+        }
+        if (creep.pos.getRangeTo(source) > 1) {
+            creep.moveTo(source);
+        }
+        creep.harvest(source);
     }
 }
