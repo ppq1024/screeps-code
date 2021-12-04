@@ -52,6 +52,37 @@ export const harvester = {
             return;
         }
 
-        console.log('No task:', creep.name);
+        if (creep.store.getFreeCapacity() == 0) {
+            var target = Game.getObjectById<AnyStoreStructure>(creep.memory['targetID']);
+
+            if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return (structure.structureType == STRUCTURE_EXTENSION ||
+                            structure.structureType == STRUCTURE_SPAWN ||
+                            structure.structureType == STRUCTURE_TOWER) &&
+                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                    }
+                });
+                if (target) {
+                    creep.memory['targetID'] = target.id;
+                }
+            }
+
+            if (target) {
+                if (creep.pos.getRangeTo(target) > 1) {
+                    creep.moveTo(target);
+                }
+                var result = creep.transfer(target, RESOURCE_ENERGY)
+                if (result != OK && result != ERR_NOT_IN_RANGE) {
+                    console.log('Cannot give energy with error code:', result);
+                }
+            }  
+        }
+
+        var sources = creep.room.find(FIND_SOURCES_ACTIVE);
+        if (sources) {
+            source = sources[0];
+        }
     }
 }
