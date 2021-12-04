@@ -24,7 +24,7 @@ interface CreepMemory {
     controlled: boolean,
     task?: Task,
     station?: string,
-    body?: BodyPartConstant[]
+    body?: BodyUnit[]
     respawn?: boolean
 }
 
@@ -77,4 +77,9 @@ interface WorkerTask extends Task {
     name: string,
     source: Source | Mineral | Deposit | Structure,
     target: Structure | ConstructionSite | Creep
+}
+
+interface BodyUnit {
+    unit: BodyPartConstant[],
+    repeat: number
 }
