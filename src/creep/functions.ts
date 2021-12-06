@@ -20,5 +20,30 @@ export const functions = {
         Game.rooms[target.description].storage :
         Game.getObjectById<AnyStoreStructure>(target.description),
     
-    
+    getEnergy: (creep: Creep) => {
+        var store = Game.rooms[Memory['home']].storage;
+        if (store && store.store.energy > 0) {
+            var result = creep.withdraw(store, RESOURCE_ENERGY);
+            if (result == ERR_NOT_IN_RANGE) {
+                creep.moveTo(store);
+            }
+            return true;
+        }
+        
+        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return structure.structureType == STRUCTURE_CONTAINER &&
+                    structure.store.energy > 0;
+            }
+        });
+        if (container) {
+            var result = creep.withdraw(container, RESOURCE_ENERGY);
+            if (result == ERR_NOT_IN_RANGE) {
+                creep.moveTo(container);
+            }
+            return true;
+        }
+
+        return false;
+    }
 }

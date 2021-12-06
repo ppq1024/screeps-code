@@ -24,6 +24,7 @@ interface CreepMemory {
     controlled: boolean,
     task?: Task,
     station?: string,
+    working?: boolean,
     body?: BodyUnit[]
     respawn?: boolean
 }
@@ -39,7 +40,15 @@ interface SpawnMemory {
 
 interface Memory {
     home: string,
-    staticTask: { [name: string]: Task }
+    staticTask: { [name: string]: Task },
+    stats: {
+        gcl?: number,
+        gclLevel?: number,
+        gpl?: number,
+        gplLevel?: number,
+        cpu?: number,
+        bucket?: number
+    }
 }
 
 interface Team {

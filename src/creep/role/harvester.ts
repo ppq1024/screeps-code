@@ -41,6 +41,9 @@ export const harvester = {
             if (creep.store.getFreeCapacity() == 0) {
                 result = creep.transfer(target, RESOURCE_ENERGY);
                 if (result != OK && result != ERR_NOT_IN_RANGE) {
+                    if (result == ERR_FULL) {
+                        return;
+                    }
                     console.log('Cannot give energy with error code:', result);
                 }
             }
@@ -77,23 +80,25 @@ export const harvester = {
                 if (result != OK && result != ERR_NOT_IN_RANGE) {
                     console.log('Cannot give energy with error code:', result);
                 }
-            }  
-        }
-
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-            var target = Game.getObjectById<AnyStoreStructure>(creep.memory['targetID']);
-            if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (structure) => (structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN ||
-                            structure.structureType == STRUCTURE_TOWER) &&
-                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                });
-                if (target) {
-                    creep.memory['targetID'] = target.id;
-                }
+                return;
             }
 
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return structure.structureType == STRUCTURE_CONTAINER &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                }
+            });
+
+            if (target) {
+                if (creep.pos.getRangeTo(target) > 1) {
+                    creep.moveTo(target);
+                }
+                var result = creep.transfer(target, RESOURCE_ENERGY)
+                if (result != OK && result != ERR_NOT_IN_RANGE) {
+                    console.log('Cannot give energy with error code:', result);
+                }
+            }
             return;
         }
 

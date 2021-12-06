@@ -18,14 +18,14 @@
 export const builder = {
     run: function (creep: Creep) {
 
-        if (creep.memory['building'] && creep.store.energy == 0) {
-            creep.memory['building'] = false;
+        if (creep.memory.working && creep.store.energy == 0) {
+            creep.memory.working = false;
         }
-        if (!creep.memory['building'] && creep.store.getFreeCapacity() == 0) {
-            creep.memory['building'] = true;
+        if (!creep.memory.working && creep.store.getFreeCapacity() == 0) {
+            creep.memory.working = true;
         }
 
-        if (creep.memory['building']) {
+        if (creep.memory.working) {
             var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
             if (target) {
                 if (creep.build(target) == ERR_NOT_IN_RANGE) {
@@ -34,14 +34,14 @@ export const builder = {
                 return;
             }
 
-            if (creep.upgradeController(Game.rooms[Memory['home']].controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(Game.rooms[Memory['home']].controller);
+            if (creep.upgradeController(Game.rooms[Memory.home].controller) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(Game.rooms[Memory.home].controller);
             }
 
             return;
         }
 
-        var store = Game.rooms[Memory['home']].storage;
+        var store = Game.rooms[Memory.home].storage;
         if (store && store.store.energy > 0) {
             var result = creep.withdraw(store, RESOURCE_ENERGY);
             if (result == ERR_NOT_IN_RANGE) {
