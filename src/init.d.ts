@@ -22,10 +22,15 @@ interface Creep {
 interface CreepMemory {
     role: string
     controlled: boolean,
+    body: BodyUnit[],
     task?: Task,
-    station?: string,
-    body?: BodyUnit[]
+    station?: WorkStation,
     respawn?: boolean
+}
+
+interface WorkStation {
+    working?: boolean,
+    target?: StructureTarget
 }
 
 interface RoomMemory {
@@ -39,7 +44,15 @@ interface SpawnMemory {
 
 interface Memory {
     home: string,
-    staticTask: { [name: string]: Task }
+    staticTask: { [name: string]: Task },
+    stats: {
+        gcl?: number,
+        gclLevel?: number,
+        gpl?: number,
+        gplLevel?: number,
+        cpu?: number,
+        bucket?: number
+    }
 }
 
 interface Team {
@@ -71,7 +84,7 @@ interface HarvesterTask extends Task {
 
 interface StructureTarget {
     type: StructureConstant,
-    description: string
+    description?: string
 }
 
 interface WorkerTask extends Task {

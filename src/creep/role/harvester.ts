@@ -18,93 +18,43 @@
  import { functions } from "@/creep/functions";
 
 export const harvester = {
-    run: function (creep: Creep) {
-        if (creep.spawning) {
-            return;
-        }
-
+    run: (creep: Creep) => {
         var task = <HarvesterTask> creep.memory.task;
         if (task) {
-            if (task.static) {
-                task = <HarvesterTask> Memory.staticTask[task.name];
-            }
-
-            var source = Game.getObjectById<Source>(task.sourceID);
-            var target = functions.getTarget(task.target);
-            var flag = Game.flags[task.flag];
-
-            if (creep.pos.getRangeTo(flag) > 0) {
-                creep.moveTo(flag);
-            }
-
-            var result: ScreepsReturnCode;
-            if (creep.store.getFreeCapacity() == 0) {
-                result = creep.transfer(target, RESOURCE_ENERGY);
-                if (result != OK && result != ERR_NOT_IN_RANGE) {
-                    console.log('Cannot give energy with error code:', result);
-                }
-            }
-
-            result = creep.harvest(source);
-            if (result != OK && result != ERR_NOT_IN_RANGE) {
-                console.log('Cannot harvest energy with error code:', result);
-            }
+            harvester.doTask(creep, task);
             return;
         }
 
+        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+        if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION))) {
+            functions.rawHarvest(creep);
+        }
+    },
+
+    doTask: (creep: Creep, task: HarvesterTask) => {
+        if (task.static) {
+            task = <HarvesterTask> Memory.staticTask[task.name];
+        }
+
+        var source = Game.getObjectById(<Id<Source>> task.sourceID);
+        var target = functions.getTarget(task.target);
+        var flag = Game.flags[task.flag];
+
+        if (!functions.moveTo(creep, flag)) {
+            return;
+        }
+
+        var result: ScreepsReturnCode;
         if (creep.store.getFreeCapacity() == 0) {
-            var target = Game.getObjectById<AnyStoreStructure>(creep.memory['targetID']);
-
-            if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN ||
-                            structure.structureType == STRUCTURE_TOWER) &&
-                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-                    }
-                });
-                if (target) {
-                    creep.memory['targetID'] = target.id;
-                }
+            result = creep.transfer(target, RESOURCE_ENERGY);
+            if (result == ERR_FULL) {
+                return;
             }
-
-            if (target) {
-                if (creep.pos.getRangeTo(target) > 1) {
-                    creep.moveTo(target);
-                }
-                var result = creep.transfer(target, RESOURCE_ENERGY)
-                if (result != OK && result != ERR_NOT_IN_RANGE) {
-                    console.log('Cannot give energy with error code:', result);
-                }
-            }  
         }
 
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-            var target = Game.getObjectById<AnyStoreStructure>(creep.memory['targetID']);
-            if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (structure) => (structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN ||
-                            structure.structureType == STRUCTURE_TOWER) &&
-                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                });
-                if (target) {
-                    creep.memory['targetID'] = target.id;
-                }
-            }
-
-            return;
+        result = creep.harvest(source);
+        if (result != OK) {
+            console.log('Cannot harvest energy with error code:', result);
         }
-
-        var source = Game.getObjectById<Source>(creep.memory['sourceID']);
-        if (!source) {
-            source = creep.pos.findClosestByPath(FIND_SOURCES);
-            creep.memory['sourceID'] = source.id;
-        }
-        if (creep.pos.getRangeTo(source) > 1) {
-            creep.moveTo(source);
-        }
-        creep.harvest(source);
     }
 }

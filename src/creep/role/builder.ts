@@ -15,60 +15,31 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { functions } from "@/creep/functions";
+
 export const builder = {
     run: function (creep: Creep) {
+        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
 
-        if (creep.memory['building'] && creep.store.energy == 0) {
-            creep.memory['building'] = false;
-        }
-        if (!creep.memory['building'] && creep.store.getFreeCapacity() == 0) {
-            creep.memory['building'] = true;
-        }
-
-        if (creep.memory['building']) {
+        if (station.working) {
             var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
             if (target) {
-                if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+                if (functions.moveTo(creep, target, 3)) {
+                    creep.build(target)
                 }
-                return;
             }
-
-            if (creep.upgradeController(Game.rooms[Memory['home']].controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(Game.rooms[Memory['home']].controller);
-            }
-
-            return;
-        }
-
-        var store = Game.rooms[Memory['home']].storage;
-        if (store && store.store.energy > 0) {
-            var result = creep.withdraw(store, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(store);
-            }
-            return;
-        }
-        
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-            }
-        });
-        if (container) {
-            var result = creep.withdraw(container, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(container);
+            else {
+                if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
+                    creep.upgradeController(Game.rooms[Memory.home].controller)
+                }
             }
             return;
         }
 
-        var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-        if (source) {
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-            }
+        if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
+            return;
         }
+
+        functions.rawHarvest(creep);
     }
 }

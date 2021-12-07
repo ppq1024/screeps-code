@@ -15,30 +15,44 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { functions } from "../functions";
+
+var freshWallTarget = (creep: Creep) => {
+    if (Game.time % 128 == 0 || !creep.memory.station['targetID']) {
+        var targets = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => structure.hits < structure.hitsMax
+        });
+
+        var hitsMin = targets[0];
+        targets.forEach((wall) => hitsMin = hitsMin.hits < wall.hits ? hitsMin : wall);
+        creep.memory.station['targetID'] = hitsMin.id;
+        return hitsMin;
+    }
+    return Game.getObjectById(<Id<StructureWall | StructureRampart>>creep.memory.station['targetID']);
+}
+
+var repairTarget = (creep: Creep) => {
+    var target: AnyStructure;
+    if (!creep.memory.station['targetID'] ||
+            (target = Game.getObjectById(<Id<AnyStructure>>creep.memory.station['targetID'])).hits == target.hitsMax
+    ) {
+        target = Game.rooms[Memory.home].find(FIND_STRUCTURES, {
+            filter: (structure) => structure.structureType != STRUCTURE_WALL &&
+                    structure.structureType != STRUCTURE_RAMPART &&
+                    structure.hits < structure.hitsMax
+        })[0];
+    }
+    return target;
+}
+
 export const repairer = {
     run: function(creep: Creep) {
-        if (creep.memory['repairing'] && creep.store.energy == 0) {
-            creep.memory['repairing'] = false;
-        }
-        if (!creep.memory['repairing'] && creep.store.getFreeCapacity() == 0) {
-            creep.memory['repairing'] = true;
-        }
+        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
 
-        if (Game.time % 128 == 0 || !creep.memory['targetID']) {
-            var targets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => structure.structureType == STRUCTURE_WALL && structure.hits < 30000000 || // 30M
-                        structure.structureType == STRUCTURE_RAMPART && structure.hits < structure.hitsMax
+        var target = creep.room.find(FIND_STRUCTURES, {filter: (structure) => structure.structureType == STRUCTURE_TOWER}).length ?
+                freshWallTarget(creep) : repairTarget(creep);
 
-            });
-
-            var hitsMin = targets[0];
-            targets.forEach((wall) => hitsMin = hitsMin.hits < wall.hits ? hitsMin : wall);
-            creep.memory['targetID'] = hitsMin.id;
-        }
-
-        if (creep.memory['repairing']) {
-            var target = Game.getObjectById<StructureRampart | StructureWall>(creep.memory['targetID']);
-
+        if (station.working) {
             if (target) {
                 if (creep.pos.getRangeTo(target) > 3) {
                     creep.moveTo(target);
@@ -49,27 +63,10 @@ export const repairer = {
             return;
         }
 
-        var store = Game.rooms[Memory['home']].storage;
-        if (store && store.store.energy > 0) {
-            var result = creep.withdraw(store, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(store);
-            }
+        if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
             return;
         }
-        
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-            }
-        });
-        if (container) {
-            var result = creep.withdraw(container, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(container);
-            }
-            return;
-        }
+
+        functions.rawHarvest(creep);
     }
 }

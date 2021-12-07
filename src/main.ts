@@ -19,12 +19,15 @@ import { errorMapper } from '@/modules/errorMapper';
 import { controller } from '@/creep/controllor';
 import { spawner } from '@/creep/spawner';
 import { tower } from '@/tower';
+import { stateScanner } from '@/modules/stateScanner';
 
 
 function loopUnit() {
     tower.run();
     spawner.run(Game.spawns['DEFAULT_SPAWN']);
     controller.run();
+
+    stateScanner();
 }
 
 export const loop = errorMapper(loopUnit);
