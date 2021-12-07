@@ -15,35 +15,152 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Creep使用的函数分为三大类，工作准备、工作执行、状态检查。
+ * 还有一些额外的工具函数。
+ */
 export const functions = {
-    getTarget: (target: StructureTarget) => target.type == STRUCTURE_STORAGE ?
-        Game.rooms[target.description].storage :
-        Game.getObjectById<AnyStoreStructure>(target.description),
-    
-    getEnergy: (creep: Creep) => {
-        var store = Game.rooms[Memory['home']].storage;
-        if (store && store.store.energy > 0) {
-            var result = creep.withdraw(store, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(store);
+
+    /////////////////
+    // preparation //
+    /////////////////
+    preparation: {
+        /**
+         * 从仓库（StructureStorage）或容器（StructureContainer）中获取指定资源
+         * 
+         * @param creep 需要补充资源的Creep
+         * @returns 是否被成功执行，向仓库或容器移动也被认为是成功执行，
+         *     通常只有所有仓库或容器都没有指定资源才会执行失败
+         */
+        getResource: (creep: Creep, resource: ResourceConstant) => {
+            var store = Game.rooms[Memory.home].storage;
+            var from = (store && store.store[resource] > 0) ? store : creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure) => structure.structureType == STRUCTURE_CONTAINER && structure.store[resource] > 0
+            });
+            
+            if (from && functions.moveTo(creep, from, 1)) {
+                creep.withdraw(from, resource);
             }
-            return true;
+
+            return from ? true : false;
         }
-        
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.energy > 0;
+    },
+
+    //////////
+    // work //
+    //////////
+    work: {
+        /**
+         * 为指定类型的建筑提供能量
+         * 
+         * @param creep 执行任务的creep
+         * @param type 需要提供能量的建筑类型
+         * @returns 是否被成功执行，向建筑移动也被认为是成功执行，
+         *     通常只有所有指定类型的建筑都充满能量才会执行失败
+         */
+        supply: (creep: Creep, ...type: StructureConstant[]) => {
+            if (!creep.memory.station.target) creep.memory.station.target = {type: undefined}
+            var target = functions.check.checkTarget(creep.memory.station.target, creep.pos, ...type);
+            if (target) {
+                if (functions.moveTo(creep, target, 1)) {
+                    var result = creep.transfer(target, RESOURCE_ENERGY)
+                    if (result != OK && result != ERR_NOT_IN_RANGE) {
+                        console.log('Cannot give energy with error code:', result);
+                    }
+                }
+                return true;
             }
-        });
-        if (container) {
-            var result = creep.withdraw(container, RESOURCE_ENERGY);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(container);
+            return false;
+        }
+    },
+
+    ///////////
+    // check //
+    ///////////
+    check: {
+        /**
+         * 根据指定的资源类型检查并更新Creep的工作状态
+         * 
+         * @param creep 需要检查的Creep
+         * @param resource 需要检查的资源
+         * @returns Creep的工作状态，其中的working成员可能被更新
+         */
+        checkStation: (creep: Creep, resource: ResourceConstant) => {
+            var station = creep.memory.station;
+            if (!station) station = creep.memory.station = {}
+            // (是否工作 ? 对应转换状态条件是否满足) ? 转换状态
+            station.working = (station.working ? !creep.store[resource] : !creep.store.getFreeCapacity(resource)) ?
+                    !station.working : station.working;
+            return station;
+        },
+    
+        /**
+         * 检查是否需要更换目标
+         * 
+         * @param structureTarget 目标对象
+         * @param pos 寻找新目标的基准点
+         * @param type 允许的目标建筑类型
+         * @returns 解析后的目标对象，检查过程中原对象中的数据可能会被更新
+         */
+        checkTarget: (structureTarget: StructureTarget, pos: RoomPosition, ...type: StructureConstant[]) => {
+            if (type && type.includes(structureTarget.type) ||
+                    !(target = functions.getTarget(structureTarget)) ||
+                    !target.store.getFreeCapacity()
+            ) {
+                var target = pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (structure: AnyStoreStructure) => type.includes(structure.structureType) &&
+                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                });
+                structureTarget.type = target ? target.structureType : undefined;
+                structureTarget.description = target ? target.id : undefined;
             }
+    
+            return functions.getTarget(structureTarget);
+        }
+
+    },
+    
+    /**
+     * 将StructureTarget对象解析为AnyStoreStructure对象
+     * 
+     * @param target StructureTarget对象
+     * @returns 对应的AnyStoreStructure对象，或undefined
+     */
+    getTarget: (target: StructureTarget) => target || target.type ? target.type == STRUCTURE_STORAGE ?
+        Game.rooms[target.description].storage :
+        Game.getObjectById(<Id<AnyStoreStructure>> target.description) : undefined,
+    
+    /**
+     * 向指定目标移动Creep
+     * 
+     * @param creep 需要移动的Creep
+     * @param target Creep移动的目标
+     * @param range 需要的最大距离
+     * @returns Creep是否已在目标的指定距离内
+     */
+    moveTo: (creep: Creep, target: RoomPosition | {pos: RoomPosition}, range?: number) => {
+        range = range ? range : 0;
+        if (creep.pos.getRangeTo(target) <= range) {
             return true;
         }
 
-        return false;
-    }
+        var result = creep.moveTo(target, {range: range});
+        return result == OK && creep.pos.getRangeTo(target) <= range;
+    },
+
+    /**
+     * 主要用于前期或没有能量储备时开采资源
+     * 
+     * @param creep 执行任务的Creep
+     */
+    rawHarvest: (creep: Creep) => {
+        var source = Game.getObjectById(<Id<Source>> creep.memory.station['sourceID']);
+        if (!source || source.energy == 0) {
+            source = creep.pos.findClosestByPath(FIND_SOURCES);
+            creep.memory.station['sourceID'] = source.id;
+        }
+        if (functions.moveTo(creep, source)) {
+            creep.harvest(source);
+        }
+    },
 }

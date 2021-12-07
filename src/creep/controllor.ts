@@ -32,6 +32,6 @@ var roleFunctions = {
 
 export const controller = {
     run: function () {
-        _.filter(Game.creeps, (creep) => creep.memory.controlled).forEach((creep) => roleFunctions[creep.memory.role](creep));
+        _.filter(Game.creeps, (creep) => creep.memory.controlled && !creep.spawning).forEach((creep) => roleFunctions[creep.memory.role](creep));
     }
 };
