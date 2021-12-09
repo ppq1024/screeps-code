@@ -43,10 +43,7 @@ export const carrier = {
         var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
         var target = functions.getTarget(station.working ? task.to : task.from);
         if (functions.moveTo(creep, target, 1)) {
-            var result = station.working ? creep.transfer(target, RESOURCE_ENERGY) : creep.withdraw(target, RESOURCE_ENERGY);
-            if (result != OK) {
-                console.log('carrier with error code: ', result);
-            }
+            station.working ? creep.transfer(target, RESOURCE_ENERGY) : creep.withdraw(target, RESOURCE_ENERGY);
             return;
         }
     }

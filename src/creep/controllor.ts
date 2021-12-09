@@ -19,6 +19,7 @@ import { builder } from "@/creep/role/builder";
 import { harvester } from "@/creep/role/harvester";
 import { carrier } from "@/creep/role/carrier";
 import { repairer } from "@/creep/role/repairer";
+import { upgrader } from "@/creep/role/upgrader";
 
 // hash表可比if-else和switch-case效率高多了
 // 但不太确定内存占用的问题
@@ -27,7 +28,8 @@ var roleFunctions = {
     harvester: harvester.run,
     carrier: carrier.run,
     builder: builder.run,
-    repairer: repairer.run
+    repairer: repairer.run,
+    upgrader: upgrader.run
 }
 
 export const controller = {

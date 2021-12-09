@@ -18,9 +18,11 @@
 import { functions } from "../functions";
 
 var freshWallTarget = (creep: Creep) => {
-    if (Game.time % 128 == 0 || !creep.memory.station['targetID']) {
+    if (Game.time % 64 == 0 || !creep.memory.station['targetID']) {
         var targets = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
+            filter: (structure) => (structure.structureType == STRUCTURE_WALL ||
+                    structure.structureType == STRUCTURE_RAMPART) &&
+                    structure.hits < structure.hitsMax 
         });
 
         var hitsMin = targets[0];
