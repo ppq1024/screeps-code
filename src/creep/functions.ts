@@ -126,7 +126,7 @@ export const functions = {
      * @param target StructureTarget对象
      * @returns 对应的AnyStoreStructure对象，或undefined
      */
-    getTarget: (target: StructureTarget) => target || target.type ? target.type == STRUCTURE_STORAGE ?
+    getTarget: (target: StructureTarget) => target && target.type ? target.type == STRUCTURE_STORAGE ?
         Game.rooms[target.description].storage :
         Game.getObjectById(<Id<AnyStoreStructure>> target.description) : undefined,
     
