@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,16 +16,17 @@
  */
 
 import { errorMapper } from '@/modules/errorMapper';
-import { controller } from '@/creep/controllor';
+import { teamController } from '@/team/teamController';
 import { spawner } from '@/creep/spawner';
 import { tower } from '@/tower';
+import { link } from '@/link';
 import { exportStats } from '@/modules/stats'
 
-
-function loopUnit() {
+var loopUnit = () => {
     tower.run();
+    link.run();
     spawner.run(Game.spawns['DEFAULT_SPAWN']);
-    controller.run();
+    teamController.run();
 
     exportStats();
 }

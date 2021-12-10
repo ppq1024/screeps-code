@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,21 +15,12 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface Creep {
-    doTask: () => ScreepsReturnCode | void
-}
-
 interface CreepMemory {
-    role: string
-    controlled: boolean,
-    body: BodyUnit[],
-    task?: Task,
-    station?: WorkStation,
-    respawn?: boolean
+    station?: WorkStation
 }
 
 interface WorkStation {
-    working?: boolean,
+    working?: boolean
     target?: StructureTarget
 }
 
@@ -38,62 +29,97 @@ interface RoomMemory {
 }
 
 interface SpawnMemory {
-    priorQueue: string[],
-    queue: string[]
+    priorQueue: SpawnRequest[]
+    queue: SpawnRequest[]
+}
+
+interface SpawnRequest {
+    name: string
+    body: BodyUnit[]
 }
 
 interface Memory {
-    home: string,
-    staticTask: { [name: string]: Task },
-    stats: {
-        gcl?: number,
-        gclLevel?: number,
-        gpl?: number,
-        gplLevel?: number,
-        cpu?: number,
-        bucket?: number
+    home: string
+    staticTask: { [name: string]: Task }
+    links: LinkTask[]
+    teams: {
+        [name: string]: Team
     }
+    stats: Stats
+}
+
+interface Stats {
+    gcl: {
+        progress: number
+        progressTotal: number
+        level: number
+    }
+    rooms: {
+        [name: string]: RoomStats
+    }
+    cpu: {
+        bucket: number
+        limit: number
+        used: number
+    }
+    time: number
+}
+
+interface RoomStats {
+    storageEnergy: number
+    terminalEnergy: number
+    energyAvailable: number
+    energyCapacityAvailable: number
+    controllerProgress: number
+    controllerProgressTotal: number
+    controllerLevel: number
 }
 
 interface Team {
-    [role: string]: Creep[]
-}
-
-interface Task {
-    name: string,
-    static: boolean,
-    roleLimit: string
-}
-
-interface CarrierTask extends Task {
-    roleLimit: 'carrier',
-    from?: StructureTarget,
-    to?: StructureTarget,
-    defaultPath?: {
-        from: PathStep[],
-        to: PathStep[]
+    name: string
+    type: string
+    inited?: boolean
+    room?: string
+    spawner: string
+    creeps: {
+        [name: string]: CreepDescription
     }
 }
 
-interface HarvesterTask extends Task {
-    roleLimit: 'harvester',
-    flag: string,
-    sourceID: string,
-    target: StructureTarget
+interface CreepDescription {
+    name: string
+    role: string
+    alive: {
+        work: string
+        substitute?: string
+    }
+    body: BodyUnit[]
+    task?: Task
+    autoRespawn?: boolean
+    advance?: number
+    important?: boolean
 }
 
+type TaskType = 'harvest' | 'carry'
+type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader'
+
 interface StructureTarget {
-    type: StructureConstant,
+    type: StructureConstant
     description?: string
 }
 
 interface WorkerTask extends Task {
-    name: string,
-    source: Source | Mineral | Deposit | Structure,
+    name: string
+    source: Source | Mineral | Deposit | Structure
     target: Structure | ConstructionSite | Creep
 }
 
 interface BodyUnit {
-    unit: BodyPartConstant[],
+    unit: BodyPartConstant[]
     repeat: number
+}
+
+interface LinkTask {
+    sourceID: string
+    targetID: string
 }

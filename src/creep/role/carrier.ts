@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,35 +16,16 @@
  */
 
 import { functions } from "@/creep/functions";
+import { RoleBehavior } from "@/creep/role/RoleBehavior";
 
-export const carrier = {
-    run: function(creep: Creep) {
-        var task = <CarrierTask> creep.memory.task;
-        if (task) {
-            carrier.doTask(creep, task);
-            return;
-        }
-
-        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-        if (!(station.working && (
-                functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION) || 
-                functions.work.supply(creep, STRUCTURE_TOWER)
-        ))) {
-            functions.preparation.getResource(creep, RESOURCE_ENERGY);
-        }
-    },
-
-    doTask: (creep: Creep, task: CarrierTask) => {
-        if (task.static) {
-            task = <CarrierTask> Memory.staticTask[task.name];
-        }
-        
-        // station未定义意味着creep刚被生成
-        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-        var target = functions.getTarget(station.working ? task.to : task.from);
-        if (functions.moveTo(creep, target, 1)) {
-            station.working ? creep.transfer(target, RESOURCE_ENERGY) : creep.withdraw(target, RESOURCE_ENERGY);
-            return;
-        }
+var run = (creep: Creep) => {
+    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+    if (!(station.working && (
+            functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION) || 
+            functions.work.supply(creep, STRUCTURE_TOWER)
+    ))) {
+        functions.preparation.getResource(creep, RESOURCE_ENERGY);
     }
 }
+
+export const carrier = new RoleBehavior(run);

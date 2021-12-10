@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,25 +15,17 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { builder } from "@/creep/role/builder";
-import { harvester } from "@/creep/role/harvester";
-import { carrier } from "@/creep/role/carrier";
-import { repairer } from "@/creep/role/repairer";
-import { upgrader } from "@/creep/role/upgrader";
+import {roomer} from "@/team/type/roomer";
+import {outer} from "@/team/type/outers";
+import { TeamBehavior } from "@/team/TeamBehavior";
 
-// hash表可比if-else和switch-case效率高多了
-// 但不太确定内存占用的问题
-// 因为对JS底层不太熟
-var roleFunctions = {
-    harvester: harvester.run,
-    carrier: carrier.run,
-    builder: builder.run,
-    repairer: repairer.run,
-    upgrader: upgrader.run
+const teamBehaviour: {[name: string]:TeamBehavior} = {
+    roomer: roomer,
+    outer: outer
 }
 
-export const controller = {
-    run: function () {
-        _.filter(Game.creeps, (creep) => creep.memory.controlled && !creep.spawning).forEach((creep) => roleFunctions[creep.memory.role](creep));
+export const teamController = {
+    run: () => {
+        _.forEach(Memory.teams, (team) => teamBehaviour[team.type].run(team));
     }
-};
+}

@@ -15,14 +15,12 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
-
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION))) {
-        functions.rawHarvest(creep);
+export class RoleBehavior {
+    constructor(
+        run: (creep: Creep) => void
+    ) {
+        this.run = run;
     }
-}
 
-export const harvester = new RoleBehavior(run);
+    run: (creep: Creep) => void
+}

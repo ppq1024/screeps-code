@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,7 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "../functions";
+import { functions } from "@/creep/functions";
+import { RoleBehavior } from "@/creep/role/RoleBehavior";
 
 var freshWallTarget = (creep: Creep) => {
     if (Game.time % 64 == 0 || !creep.memory.station['targetID']) {
@@ -47,28 +48,28 @@ var repairTarget = (creep: Creep) => {
     return target;
 }
 
-export const repairer = {
-    run: function(creep: Creep) {
-        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+var run = (creep: Creep) => {
+    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
 
-        var target = creep.room.find(FIND_STRUCTURES, {filter: (structure) => structure.structureType == STRUCTURE_TOWER}).length ?
-                freshWallTarget(creep) : repairTarget(creep);
+    var target = creep.room.find(FIND_STRUCTURES, {filter: (structure) => structure.structureType == STRUCTURE_TOWER}).length ?
+            freshWallTarget(creep) : repairTarget(creep);
 
-        if (station.working) {
-            if (target) {
-                if (creep.pos.getRangeTo(target) > 3) {
-                    creep.moveTo(target);
-                }
-                creep.repair(target);
+    if (station.working) {
+        if (target) {
+            if (creep.pos.getRangeTo(target) > 3) {
+                creep.moveTo(target);
             }
-
-            return;
+            creep.repair(target);
         }
 
-        if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
-            return;
-        }
-
-        functions.rawHarvest(creep);
+        return;
     }
+
+    if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
+        return;
+    }
+
+    functions.rawHarvest(creep);
 }
+
+export const repairer = new RoleBehavior(run);

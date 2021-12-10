@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  */
 
 export const tower = {
-    run: function() {
+    run: () => {
         var tower = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_TOWER);
         tower.forEach((tower: StructureTower) => {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {

@@ -15,14 +15,30 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
-
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION))) {
-        functions.rawHarvest(creep);
+export class TeamBehavior {
+    constructor(
+        init: (team: Team) => boolean,
+        doTask: (team: Team) => void,
+        spawn: (team: Team) => void
+    ) {
+        this.init = init;
+        this.doTask = doTask;
+        this.spawn = spawn;
     }
-}
 
-export const harvester = new RoleBehavior(run);
+    run(team: Team)  {
+        if (!team.inited && !this.init(team)) {
+            console.log('Cannot init this team: ', team.name);
+            return;
+        }
+
+        this.spawn(team);
+        this.doTask(team);
+    }
+
+    init: (team: Team) => boolean
+
+    doTask: (team: Team) => void
+
+    spawn: (team: Team) => void
+}

@@ -15,14 +15,24 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
-
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION))) {
-        functions.rawHarvest(creep);
-    }
+interface Task {
+    type: TaskType
+    roleLimit?: Role
 }
 
-export const harvester = new RoleBehavior(run);
+interface CarryTask extends Task {
+    type: 'carry'
+    roleLimit: 'carrier'
+    resource: ResourceConstant
+    from?: StructureTarget
+    to?: StructureTarget
+}
+
+interface HarvestTask extends Task {
+    type: 'harvest'
+    roleLimit: 'harvester'
+    flag: string
+    sourceID: string
+    target: StructureTarget
+}
+
