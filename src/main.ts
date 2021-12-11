@@ -25,8 +25,12 @@ import { exportStats } from '@/modules/stats'
 var loopUnit = () => {
     tower.run();
     link.run();
-    spawner.run(Game.spawns['DEFAULT_SPAWN']);
+    spawner.run();
     teamController.run();
+
+    if (Game.cpu.bucket >= 10000) {
+        Game.cpu.generatePixel();
+    }
 
     exportStats();
 }

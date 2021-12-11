@@ -29,14 +29,20 @@ export const functions = {
          * 从仓库（StructureStorage）或容器（StructureContainer）中获取指定资源
          * 
          * @param creep 需要补充资源的Creep
+         * @param resource 需要补充的资源类型
+         * @param room 资源所在的房间，未指定则为Creep所在房间
          * @returns 是否被成功执行，向仓库或容器移动也被认为是成功执行，
          *     通常只有所有仓库或容器都没有指定资源才会执行失败
          */
-        getResource: (creep: Creep, resource: ResourceConstant) => {
-            var store = Game.rooms[Memory.home].storage;
-            var from = (store && store.store[resource] > 0) ? store : creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        getResource: (creep: Creep, resource: ResourceConstant, room?: Room) => {
+            room = room ? room : creep.room;
+            var store = room.storage;
+            var from = (store && store.store[resource] > 0) ? store :
+                    creep.room == room ? creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure) => structure.structureType == STRUCTURE_CONTAINER && structure.store[resource] > 0
-            });
+                    }) : room.find(FIND_STRUCTURES, {
+                    filter: (structure) => structure.structureType == STRUCTURE_CONTAINER && structure.store[resource] > 0
+                    })[0];
             
             if (from && functions.moveTo(creep, from, 1)) {
                 creep.withdraw(from, resource);
@@ -156,10 +162,13 @@ export const functions = {
     rawHarvest: (creep: Creep) => {
         var source = Game.getObjectById(<Id<Source>> creep.memory.station['sourceID']);
         if (!source || source.energy == 0) {
-            source = creep.pos.findClosestByPath(FIND_SOURCES);
+            source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+            if (!source) {
+                return;
+            }
             creep.memory.station['sourceID'] = source.id;
         }
-        if (functions.moveTo(creep, source)) {
+        if (functions.moveTo(creep, source, 1)) {
             creep.harvest(source);
         }
     },

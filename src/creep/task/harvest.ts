@@ -15,29 +15,25 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { TaskExcutor } from "@/creep/task/TaskExcutor";
+import { functions } from '@/creep/functions';
+import { TaskExcutor } from '@/creep/task/TaskExcutor';
 
 var run = (creep: Creep, task: HarvestTask) => {
     var source = Game.getObjectById(<Id<Source>> task.sourceID);
     var target = functions.getTarget(task.target);
-    var flag = Game.flags[task.flag];
 
-    if (!functions.moveTo(creep, flag)) {
-        return;
-    }
-
-    var result: ScreepsReturnCode;
     if (creep.store.getFreeCapacity() == 0) {
-        result = creep.transfer(target, RESOURCE_ENERGY);
+        if (!functions.moveTo(creep, target, 1)) {
+            return;
+        }
+        var result = creep.transfer(target, RESOURCE_ENERGY);
         if (result == ERR_FULL) {
             return;
         }
     }
 
-    result = creep.harvest(source);
-    if (result != OK) {
-        console.log('Cannot harvest energy with error code:', result);
+    if (functions.moveTo(creep, source, 1)) {
+        creep.harvest(source);
     }
 }
 

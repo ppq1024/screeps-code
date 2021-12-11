@@ -15,22 +15,23 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { functions } from '@/creep/functions';
+import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var run = (creep: Creep) => {
+var run = (creep: Creep, room: Room) => {
     var station = creep.memory.station;
-    if (!station) station =  creep.memory.station = {}
+    if (!station) station =  creep.memory.station = {};
+    room = room ? room : creep.room;
 
     if (creep.store.energy > 0) {
-        if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
-            creep.upgradeController(Game.rooms[Memory.home].controller)
+        if (functions.moveTo(creep, room.controller, 3)) {
+            creep.upgradeController(room.controller)
         }
     }
 
     var target = functions.getTarget(station.target);
     if (!target) {
-        target = <AnyStoreStructure> Game.rooms[Memory.home].controller.pos.findInRange(FIND_STRUCTURES, 4, {
+        target = <AnyStoreStructure> room.controller.pos.findInRange(FIND_STRUCTURES, 4, {
             filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER ||
                     structure.structureType == STRUCTURE_LINK ||
                     structure.structureType == STRUCTURE_STORAGE) &&

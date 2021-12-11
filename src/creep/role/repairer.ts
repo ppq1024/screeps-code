@@ -15,8 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { functions } from '@/creep/functions';
+import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
 var freshWallTarget = (creep: Creep) => {
     if (Game.time % 64 == 0 || !creep.memory.station['targetID']) {
@@ -28,6 +28,9 @@ var freshWallTarget = (creep: Creep) => {
 
         var hitsMin = targets[0];
         targets.forEach((wall) => hitsMin = hitsMin.hits < wall.hits ? hitsMin : wall);
+        if (!hitsMin) {
+            return undefined;
+        }
         creep.memory.station['targetID'] = hitsMin.id;
         return hitsMin;
     }
@@ -39,7 +42,7 @@ var repairTarget = (creep: Creep) => {
     if (!creep.memory.station['targetID'] ||
             (target = Game.getObjectById(<Id<AnyStructure>>creep.memory.station['targetID'])).hits == target.hitsMax
     ) {
-        target = Game.rooms[Memory.home].find(FIND_STRUCTURES, {
+        target = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => structure.structureType != STRUCTURE_WALL &&
                     structure.structureType != STRUCTURE_RAMPART &&
                     structure.hits < structure.hitsMax

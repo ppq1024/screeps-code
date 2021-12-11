@@ -47,15 +47,25 @@ var spawnQueue = (spawner: StructureSpawn, queue: SpawnRequest[]) => {
 }
 
 export const spawner = {
-    run: function (spawner: StructureSpawn) {
-        if (spawner.spawning) {
-            return;
-        }
+    run: function () {
+        _.forEach(Game.spawns, (spawner) => {
+            if (spawner.spawning) {
+                return;
+            }
+    
+            if (spawnQueue(spawner, spawner.memory.priorQueue)) {
+                return;
+            }
+    
+            spawnQueue(spawner, spawner.memory.queue);
+        });
 
-        if (spawnQueue(spawner, spawner.memory.priorQueue)) {
-            return;
+        if (!(Game.time & 0xff)) {
+            _.forEach(Memory.creeps, (_memory, name) => {
+                if (!Game.creeps[name]) {
+                    delete Memory.creeps[name];
+                }
+            })
         }
-
-        spawnQueue(spawner, spawner.memory.queue);
     }
 };

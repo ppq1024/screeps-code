@@ -15,11 +15,33 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TeamBehavior } from "../TeamBehavior";
+import { TeamBehavior } from '@/team/TeamBehavior';
 
 var init = (team: Team) => {
     //TODO
-    return true
+    team.creeps.worker1 = {
+        name: 'worker1',
+        role: 'worker',
+        alive: {
+            work: undefined
+        },
+        body: [{
+            unit: [WORK, CARRY, MOVE],
+            repeat: 8
+        }],
+        autoRespawn: true
+    }
+    return team.inited = true;
 }
 
-export const outer = new TeamBehavior(init, null, null);
+var doTask = (team: Team) => {
+    //TODO
+    _.forEach(team.creeps, (description) => {
+
+    });
+}
+
+export const outer = new TeamBehavior({
+    init: init,
+    doTask: doTask,
+});

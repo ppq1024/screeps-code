@@ -31,8 +31,11 @@ interface CarryTask extends Task {
 interface HarvestTask extends Task {
     type: 'harvest'
     roleLimit: 'harvester'
-    flag: string
     sourceID: string
     target: StructureTarget
 }
 
+interface ObserveTask extends Task {
+    type: 'observe'
+    flag: string
+}

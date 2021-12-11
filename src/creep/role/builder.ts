@@ -15,22 +15,23 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { functions } from '@/creep/functions';
+import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var run = (creep: Creep) => {
+var run = (creep: Creep, room: Room) => {
     var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+    room = room ? room : creep.room;
 
     if (station.working) {
         var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-        if (target) {
+        if (target && room.controller.ticksToDowngrade > 1000) {
             if (functions.moveTo(creep, target, 3)) {
                 creep.build(target)
             }
         }
         else {
-            if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
-                creep.upgradeController(Game.rooms[Memory.home].controller)
+            if (functions.moveTo(creep, room.controller, 3)) {
+                creep.upgradeController(room.controller)
             }
         }
         return;
