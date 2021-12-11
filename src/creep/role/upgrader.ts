@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,34 +16,38 @@
  */
 
 import { functions } from "@/creep/functions";
+import { RoleBehavior } from "@/creep/role/RoleBehavior";
 
-export const upgrader = {
-    run: function (creep: Creep) {
-        var station = creep.memory.station;
-        if (!station) station =  creep.memory.station = {}
+var run = (creep: Creep) => {
+    var station = creep.memory.station;
+    if (!station) station =  creep.memory.station = {}
 
-        if (creep.store.energy > 0) {
-            if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
-                creep.upgradeController(Game.rooms[Memory.home].controller)
-            }
-        }
-
-        var target = functions.getTarget(station.target);
-        if (!target) {
-            target = <AnyStoreStructure> Game.rooms[Memory.home].controller.pos.findInRange(FIND_STRUCTURES, 4, {
-                filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER ||
-                        structure.structureType == STRUCTURE_LINK ||
-                        structure.structureType == STRUCTURE_STORAGE) &&
-                        structure.store.energy > 0
-            })[0];
-            station.target = {
-                type: target.structureType,
-                description: target.structureType == STRUCTURE_STORAGE ? target.room.name : target.id
-            }
-        }
-
-        if (functions.moveTo(creep, target, 1)) {
-            creep.withdraw(target, RESOURCE_ENERGY)
+    if (creep.store.energy > 0) {
+        if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
+            creep.upgradeController(Game.rooms[Memory.home].controller)
         }
     }
+
+    var target = functions.getTarget(station.target);
+    if (!target) {
+        target = <AnyStoreStructure> Game.rooms[Memory.home].controller.pos.findInRange(FIND_STRUCTURES, 4, {
+            filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER ||
+                    structure.structureType == STRUCTURE_LINK ||
+                    structure.structureType == STRUCTURE_STORAGE) &&
+                    structure.store.energy > 0
+        })[0];
+        if (!target) {
+            return;
+        }
+        station.target = {
+            type: target.structureType,
+            description: target.structureType == STRUCTURE_STORAGE ? target.room.name : target.id
+        }
+    }
+
+    if (functions.moveTo(creep, target, 1)) {
+        creep.withdraw(target, RESOURCE_ENERGY)
+    }
 }
+
+export const upgrader = new RoleBehavior(run);

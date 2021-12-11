@@ -1,0 +1,10 @@
+v0.2
+    * 添加Link逻辑
+    * 完成信息收集
+    * 统一代码风格（可能会漏一点）
+    * 修改控制逻辑
+        * Creep的行为不再由controller控制，改由Team控制
+        * 从Role的行为中去除Task，改由Team对Task的调用
+        * Creep的重生改由Team控制，并修改Spawner的队列逻辑
+        * 添加了外矿的文件但为实现
+    * 修改部分bug（好像有吧）

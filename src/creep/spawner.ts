@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -29,18 +29,17 @@ var parseBody = (body: BodyUnit[]) => {
     return result;
 }
 
-var spawnQueue = (spawner: StructureSpawn, queue: string[]) => {
-    var name = queue[0];
-    if (!name) {
+var spawnQueue = (spawner: StructureSpawn, queue: SpawnRequest[]) => {
+    if (!queue.length) {
         return false;
     }
 
-    var body = parseBody(Memory.creeps[name].body);
-    if (spawner.spawnCreep(body, name, {dryRun: true}) == OK) {
-        spawner.spawnCreep(body, name);
-        Memory.creeps[name].respawn = false;
+    var request = queue[0];
+    var body = parseBody(request.body);
+    if (spawner.spawnCreep(body, request.name, {dryRun: true}) == OK) {
+        spawner.spawnCreep(body, request.name);
         queue.shift();
-        console.log('Respawned creep:', name);
+        console.log('Respawned creep:', request.name);
         return true;
     }
 
@@ -49,20 +48,6 @@ var spawnQueue = (spawner: StructureSpawn, queue: string[]) => {
 
 export const spawner = {
     run: function (spawner: StructureSpawn) {
-        _.forEach(Memory.creeps, (creep_memory, name) => {
-            if (!Game.creeps[name] && !creep_memory.respawn) {
-                if (creep_memory['important']) {
-                    spawner.memory.priorQueue.push(name);
-                }
-                else {
-                    spawner.memory.queue.push(name);
-                }
-                creep_memory.respawn = true;
-                delete creep_memory.station;
-                console.log('Prepare to respawn creep:', name);
-            }
-        });
-
         if (spawner.spawning) {
             return;
         }

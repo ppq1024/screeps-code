@@ -16,31 +16,29 @@
  */
 
 import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { TaskExcutor } from "@/creep/task/TaskExcutor";
 
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+var run = (creep: Creep, task: HarvestTask) => {
+    var source = Game.getObjectById(<Id<Source>> task.sourceID);
+    var target = functions.getTarget(task.target);
+    var flag = Game.flags[task.flag];
 
-    if (station.working) {
-        var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-        if (target) {
-            if (functions.moveTo(creep, target, 3)) {
-                creep.build(target)
-            }
-        }
-        else {
-            if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
-                creep.upgradeController(Game.rooms[Memory.home].controller)
-            }
-        }
+    if (!functions.moveTo(creep, flag)) {
         return;
     }
 
-    if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
-        return;
+    var result: ScreepsReturnCode;
+    if (creep.store.getFreeCapacity() == 0) {
+        result = creep.transfer(target, RESOURCE_ENERGY);
+        if (result == ERR_FULL) {
+            return;
+        }
     }
 
-    functions.rawHarvest(creep);
+    result = creep.harvest(source);
+    if (result != OK) {
+        console.log('Cannot harvest energy with error code:', result);
+    }
 }
 
-export const builder = new RoleBehavior(run);
+export const harvest = new TaskExcutor(run);

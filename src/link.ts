@@ -15,14 +15,14 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
-
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION))) {
-        functions.rawHarvest(creep);
+export const link = {
+    run: () => {
+        Memory.links.forEach((linkTask) => {
+            var source = Game.getObjectById(<Id<StructureLink>> linkTask.sourceID);
+            var target = Game.getObjectById(<Id<StructureLink>> linkTask.targetID);
+            if (source.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+                source.transferEnergy(target);
+            }
+        });
     }
 }
-
-export const harvester = new RoleBehavior(run);

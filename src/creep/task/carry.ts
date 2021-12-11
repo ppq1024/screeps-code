@@ -16,31 +16,15 @@
  */
 
 import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { TaskExcutor } from "@/creep/task/TaskExcutor";
 
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-
-    if (station.working) {
-        var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-        if (target) {
-            if (functions.moveTo(creep, target, 3)) {
-                creep.build(target)
-            }
-        }
-        else {
-            if (functions.moveTo(creep, Game.rooms[Memory.home].controller, 3)) {
-                creep.upgradeController(Game.rooms[Memory.home].controller)
-            }
-        }
-        return;
+var run = (creep: Creep, task: CarryTask) => {
+    var resource = task.resource;
+    var station = functions.check.checkStation(creep, resource);
+    var target = functions.getTarget(station.working ? task.to : task.from);
+    if (functions.moveTo(creep, target, 1)) {
+        station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
     }
-
-    if (functions.preparation.getResource(creep, RESOURCE_ENERGY)) {
-        return;
-    }
-
-    functions.rawHarvest(creep);
 }
 
-export const builder = new RoleBehavior(run);
+export const carry = new TaskExcutor(run);
