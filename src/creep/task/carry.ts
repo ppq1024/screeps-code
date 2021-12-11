@@ -15,8 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { TaskExcutor } from "@/creep/task/TaskExcutor";
+import { functions } from '@/creep/functions';
+import { TaskExcutor } from '@/creep/task/TaskExcutor';
 
 var run = (creep: Creep, task: CarryTask) => {
     var resource = task.resource;

@@ -77,7 +77,7 @@ interface RoomStats {
 
 interface Team {
     name: string
-    type: string
+    type: TeamType
     inited?: boolean
     room?: string
     spawner: string
@@ -88,9 +88,9 @@ interface Team {
 
 interface CreepDescription {
     name: string
-    role: string
+    role: Role
     alive: {
-        work: string
+        work?: string
         substitute?: string
     }
     body: BodyUnit[]
@@ -100,8 +100,9 @@ interface CreepDescription {
     important?: boolean
 }
 
-type TaskType = 'harvest' | 'carry'
-type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader'
+type TeamType = 'roomer' | 'outer' | 'immigrant'
+type TaskType = 'harvest' | 'carry' | 'observe'
+type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'observer' | 'worker' | 'claimer'
 
 interface StructureTarget {
     type: StructureConstant

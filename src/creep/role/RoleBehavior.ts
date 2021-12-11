@@ -17,10 +17,10 @@
 
 export class RoleBehavior {
     constructor(
-        run: (creep: Creep) => void
+        run: (creep: Creep, room?: Room) => void
     ) {
         this.run = run;
     }
 
-    run: (creep: Creep) => void
+    run: (creep: Creep, room?: Room) => void
 }

@@ -14,7 +14,7 @@
  
  // 第一次报错时创建 sourceMap
  const getConsumer = function () {
-     if (consumer == null) consumer = new SourceMapConsumer(require("main.js.map"))
+     if (consumer == null) consumer = new SourceMapConsumer(require('main.js.map'))
      return consumer
  }
  
@@ -37,11 +37,11 @@
      const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\\/]+):(\d+):(\d+)\)?$/gm
      let match
      let outStack = error.toString()
-     console.log("ErrorMapper -> sourceMappedStackTrace -> outStack", outStack)
+     console.log('ErrorMapper -> sourceMappedStackTrace -> outStack', outStack)
  
      while ((match = re.exec(stack))) {
          // 解析完成
-         if (match[2] !== "main") break
+         if (match[2] !== 'main') break
          
          // 获取追踪定位
          const pos = getConsumer().originalPositionFor({
@@ -86,7 +86,7 @@
                      `沙盒模式无法使用 source-map - 显示原始追踪栈<br>${_.escape(e.stack)}` :
                      `${_.escape(sourceMappedStackTrace(e))}`
                  
-                 console.log(`<text style="color:#ef9a9a">${errorMessage}</text>`)
+                 console.log(`<text style='color:#ef9a9a'>${errorMessage}</text>`)
              }
              // 处理不了，直接抛出
              else throw e

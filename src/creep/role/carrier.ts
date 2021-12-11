@@ -15,8 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from "@/creep/functions";
-import { RoleBehavior } from "@/creep/role/RoleBehavior";
+import { functions } from '@/creep/functions';
+import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
 var run = (creep: Creep) => {
     var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
