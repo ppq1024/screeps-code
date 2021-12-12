@@ -102,7 +102,7 @@ interface CreepDescription {
 
 type TeamType = 'roomer' | 'outer' | 'immigrant'
 type TaskType = 'harvest' | 'carry' | 'observe'
-type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'observer' | 'worker' | 'claimer'
+type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner'
 
 interface StructureTarget {
     type: StructureConstant

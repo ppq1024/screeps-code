@@ -24,6 +24,7 @@ import { harvest } from '@/creep/task/harvest';
 import { carry } from '@/creep/task/carry';
 import { TaskExcutor } from '@/creep/task/TaskExcutor';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
+import { cleaner } from '@/creep/role/cleaner';
 
 const roleBehaviors: {[role: string]: RoleBehavior} = {
     harvester: harvester,
@@ -31,6 +32,7 @@ const roleBehaviors: {[role: string]: RoleBehavior} = {
     builder: builder,
     repairer: repairer,
     upgrader: upgrader,
+    cleaner: cleaner
 }
 
 var tasks: {[type: string]: TaskExcutor} = {

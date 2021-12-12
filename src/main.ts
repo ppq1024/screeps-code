@@ -32,6 +32,18 @@ var loopUnit = () => {
         Game.cpu.generatePixel();
     }
 
+    if (!(Game.time & 0x3ff) && Game.resources[PIXEL] > 10) {
+        var order = Game.market.getAllOrders((order) => 
+                order.resourceType == PIXEL &&
+                order.type == ORDER_BUY &&
+                order.remainingAmount > 0
+        ).sort((a, b) => b.price - a.price)[0];
+        console.log('Order price: ', order.price);
+        var result = Game.market.deal(order.id, Math.min(order.remainingAmount, Game.resources[PIXEL]));
+        console.log('Order result: ', result);
+    }
+    
+
     exportStats();
 }
 
