@@ -107,6 +107,7 @@ type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'obs
 interface StructureTarget {
     type: StructureConstant
     description?: string
+    flag?: string
 }
 
 interface WorkerTask extends Task {

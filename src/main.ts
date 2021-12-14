@@ -42,7 +42,6 @@ var loopUnit = () => {
         var result = Game.market.deal(order.id, Math.min(order.remainingAmount, Game.resources[PIXEL]));
         console.log('Order result: ', result);
     }
-    
 
     exportStats();
 }
