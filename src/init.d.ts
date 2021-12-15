@@ -15,6 +15,11 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+interface Game {
+    createCreep(): void
+    teams: {[name: string]: Team}
+}
+
 interface CreepMemory {
     station?: WorkStation
 }
@@ -43,7 +48,7 @@ interface Memory {
     staticTask: { [name: string]: Task }
     links: LinkTask[]
     teams: {
-        [name: string]: Team
+        [name: string]: TeamMemory
     }
     stats: Stats
 }
@@ -76,6 +81,18 @@ interface RoomStats {
 }
 
 interface Team {
+    memory: TeamMemory
+    name: string
+    type: TeamType
+    creeps: {
+        [name: string]: Creep
+    }
+    spawner: StructureSpawn
+    room: Room
+    run(): void
+}
+
+interface TeamMemory {
     name: string
     type: TeamType
     inited?: boolean

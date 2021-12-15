@@ -21,26 +21,30 @@ import { spawner } from '@/creep/spawner';
 import { tower } from '@/tower';
 import { link } from '@/link';
 import { exportStats } from '@/modules/stats'
+import { command } from '@/command';
 
 var loopUnit = () => {
+    command.init();
     tower.run();
     link.run();
+    _.forEach(Game.teams, (team) => team.run());
     spawner.run();
-    teamController.run();
 
-    if (Game.cpu.bucket >= 10000) {
-        Game.cpu.generatePixel();
-    }
-
-    if (!(Game.time & 0x3ff) && Game.resources[PIXEL] > 10) {
-        var order = Game.market.getAllOrders((order) => 
-                order.resourceType == PIXEL &&
-                order.type == ORDER_BUY &&
-                order.remainingAmount > 0
-        ).sort((a, b) => b.price - a.price)[0];
-        console.log('Order price: ', order.price);
-        var result = Game.market.deal(order.id, Math.min(order.remainingAmount, Game.resources[PIXEL]));
-        console.log('Order result: ', result);
+    if (Game.resources.length) {
+        if (Game.cpu.bucket >= 10000) {
+            Game.cpu.generatePixel();
+        }
+    
+        if (!(Game.time & 0x3ff) && Game.resources[PIXEL] > 10) {
+            var order = Game.market.getAllOrders((order) => 
+                    order.resourceType == PIXEL &&
+                    order.type == ORDER_BUY &&
+                    order.remainingAmount > 0
+            ).sort((a, b) => b.price - a.price)[0];
+            console.log('Order price: ', order.price);
+            var result = Game.market.deal(order.id, Math.min(order.remainingAmount, Game.resources[PIXEL]));
+            console.log('Order result: ', result);
+        }
     }
 
     exportStats();

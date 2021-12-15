@@ -17,24 +17,7 @@
 
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
-import { TeamBehavior } from '@/team/TeamBehavior';
-
-var init = (team: Team) => {
-    //TODO
-    team.creeps.worker1 = {
-        name: 'worker1',
-        role: 'worker',
-        alive: {
-            work: undefined
-        },
-        body: [{
-            unit: [WORK, CARRY, MOVE],
-            repeat: 4
-        }],
-        autoRespawn: true
-    }
-    return team.inited = true;
-}
+import { Team } from '@/team/Team'
 
 // 目前使用硬编码
 var roleBehaviors: {[role: string]: RoleBehavior} = {
@@ -87,18 +70,32 @@ var roleBehaviors: {[role: string]: RoleBehavior} = {
     })
 }
 
-var doTask = (team: Team) => {
-    //TODO
-    _.forEach(team.creeps, (description) => {
-        var creep = Game.creeps[description.alive.work];
-        if (!creep) {
-            return;
-        }
-        roleBehaviors[description.role].run(creep);
-    });
-}
+export class Outer extends Team {
+    init(): boolean {
+        //TODO
+    this.memory.creeps.worker1 = {
+        name: 'worker1',
+        role: 'worker',
+        alive: {
+            work: undefined
+        },
+        body: [{
+            unit: [WORK, CARRY, MOVE],
+            repeat: 4
+        }],
+        autoRespawn: true
+    }
+    return this.memory.inited = true;
+    }
 
-export const outer = new TeamBehavior({
-    init: init,
-    doTask: doTask,
-});
+    doTask(): void {
+        //TODO
+        _.forEach(this.memory.creeps, (description) => {
+            var creep = Game.creeps[description.alive.work];
+            if (!creep) {
+                return;
+            }
+            roleBehaviors[description.role].run(creep);
+        });
+    }
+}

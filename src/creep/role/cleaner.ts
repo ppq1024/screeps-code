@@ -85,11 +85,14 @@ var run = (creep: Creep, room?: Room) => {
 
     if (room == Game.rooms.E24S53) {
         var container = Game.getObjectById('61b36bc1b711e1750170f9e1' as Id<StructureContainer>);
-        if (container.store.getUsedCapacity() > 0 && functions.moveTo(creep, container, 1)) {
-            for (var resource in container.store) {
-                if (creep.store.getFreeCapacity() == 0) break;
-                creep.withdraw(container, resource as ResourceConstant);
+        if (container.store.getUsedCapacity() > 0) {
+            if (functions.moveTo(creep, container, 1)) {
+                for (var resource in container.store) {
+                    if (creep.store.getFreeCapacity() == 0) break;
+                    creep.withdraw(container, resource as ResourceConstant);
+                }
             }
+            
             return;
         }
     }
