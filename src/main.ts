@@ -30,7 +30,7 @@ var loopUnit = () => {
     _.forEach(Game.teams, (team) => team.run());
     spawner.run();
 
-    if (Game.resources.length) {
+    if (Game.resources.pixel != undefined) {
         if (Game.cpu.bucket >= 10000) {
             Game.cpu.generatePixel();
         }

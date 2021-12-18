@@ -18,86 +18,66 @@
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var cleanDroppedResources = (creep: Creep) => {
-    var target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
-    if (target) {
-        if (functions.moveTo(creep, target, 1)) {
-            creep.pickup(target);
-        }
-        return true;
-    }
+/**
+ * 资源回收
+ */
+class RoleCleaner extends RoleBehavior {
+    run(creep: Creep, _description: CreepDescription, room?: Room): void {
+        room = room ? room : creep.room;
+        var station = creep.memory.station;
+        if (!station) station = creep.memory.station = {}
 
-    return false;
-}
 
-var cleanTombstones = (creep: Creep) => {
-    var target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
-        filter: (tombstone) => tombstone.store.getUsedCapacity() > 0
-    });
-    if (target) {
-        if (functions.moveTo(creep, target, 1)) {
-            _.forEach(target.store, (_count, resource: ResourceConstant) => creep.withdraw(target, resource));
-        }
-        return true;
-    }
-
-    return false;
-}
-
-var cleanRuins = (creep: Creep) => {
-    var target = creep.pos.findClosestByPath(FIND_RUINS, {
-        filter: (ruin) => ruin.store.getUsedCapacity() > 0
-    });
-    if (target) {
-        if (functions.moveTo(creep, target, 1)) {
-            _.forEach(target.store, (_count, resource: ResourceConstant) => creep.withdraw(target, resource));
-        }
-        return true;
-    }
-
-    return false;
-}
-
-var store = (creep: Creep, room: Room) => {
-    if (functions.moveTo(creep, room.storage, 1)) {
-        _.forEach(creep.store, (_count, resource: ResourceConstant) => creep.transfer(room.storage, resource)); 
-    }
-}
-
-var run = (creep: Creep, room?: Room) => {
-    room = room ? room : creep.room;
-    if (creep.store.getFreeCapacity() == 0) {
-        store(creep, room);
-        return;
-    }
-
-    if (cleanDroppedResources(creep)) {
-        return;
-    }
-
-    if (cleanTombstones(creep)) {
-        return;
-    }
-
-    if (cleanRuins(creep)) {
-        return;
-    }
-
-    if (room == Game.rooms.E24S53) {
-        var container = Game.getObjectById('61b36bc1b711e1750170f9e1' as Id<StructureContainer>);
-        if (container.store.getUsedCapacity() > 0) {
-            if (functions.moveTo(creep, container, 1)) {
-                for (var resource in container.store) {
-                    if (creep.store.getFreeCapacity() == 0) break;
-                    creep.withdraw(container, resource as ResourceConstant);
-                }
-            }
-            
+        if (!creep.store.getFreeCapacity()) {
+            this.store(creep, room);
             return;
         }
+
+        var target = Game.getObjectById(station['targetID'] as Id<Resource | Tombstone | Ruin>);
+        if (!target) {
+            station['targetID'] = undefined;
+            if ((target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES)) ||
+                (target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+                    filter: (tombstone) => tombstone.store.getUsedCapacity()
+                })) ||
+                (target = creep.pos.findClosestByPath(FIND_RUINS, {
+                    filter: (ruin) => ruin.store.getUsedCapacity()
+                }))
+            ) {
+                station['targetID'] = target.id;
+            }
+        }
+
+        if (target) {
+            if (functions.moveTo(creep, target, 1)) {
+                target instanceof Resource ? creep.pickup(target) :
+                    _.forEach(target.store, (_count, resource: ResourceConstant) => 
+                    creep.withdraw(target as Tombstone | Ruin, resource))
+            }
+            return;
+        }
+    
+        if (room == Game.rooms.E24S53) {
+            var container = Game.getObjectById('61b36bc1b711e1750170f9e1' as Id<StructureContainer>);
+            if (container.store.getUsedCapacity() > 0) {
+                if (functions.moveTo(creep, container, 1)) {
+                    for (var resource in container.store) {
+                        if (creep.store.getFreeCapacity() == 0) break;
+                        creep.withdraw(container, resource as ResourceConstant);
+                    }
+                }
+                
+                return;
+            }
+        }
+    
+        this.store(creep, room);
     }
 
-    store(creep, room);
+    store(creep: Creep, room: Room): void {
+        if (functions.moveTo(creep, room.storage, 1))
+            creep.transfer(room.storage, Object.keys(creep.store)[0] as ResourceConstant);
+    }
 }
 
-export const cleaner = new RoleBehavior(run);
+export const cleaner = new RoleCleaner();

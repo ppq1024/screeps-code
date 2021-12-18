@@ -34,7 +34,7 @@ export const functions = {
          * @returns 是否被成功执行，向仓库或容器移动也被认为是成功执行，
          *     通常只有所有仓库或容器都没有指定资源才会执行失败
          */
-        getResource: (creep: Creep, resource: ResourceConstant, room?: Room) => {
+        getResource(creep: Creep, resource: ResourceConstant, room?: Room): boolean {
             room = room ? room : creep.room;
             var store = room.storage;
             var from = (store && store.store[resource] > 0) ? store :
@@ -64,7 +64,7 @@ export const functions = {
          * @returns 是否被成功执行，向建筑移动也被认为是成功执行，
          *     通常只有所有指定类型的建筑都充满能量才会执行失败
          */
-        supply: (creep: Creep, ...type: StructureConstant[]) => {
+        supply(creep: Creep, ...type: StructureConstant[]): boolean {
             if (!creep.memory.station.target) creep.memory.station.target = {type: undefined}
             var target = functions.check.checkTarget(creep.memory.station.target, creep.pos, ...type);
             if (target) {
@@ -73,6 +73,25 @@ export const functions = {
                     if (result != OK && result != ERR_NOT_IN_RANGE) {
                         console.log('Cannot give energy with error code:', result);
                     }
+                }
+                return true;
+            }
+            return false;
+        },
+        /**
+         * 执行维修任务，包括建筑维修和刷墙
+         * 
+         * @param creep 执行维修任务的creep
+         * @returns 是否被成功执行，向建筑移动也被认为是成功执行，
+         *     通常只有没有需要维修的建筑时才会执行失败
+         */
+        repair(creep: Creep): boolean {
+            var target = creep.room.find(FIND_STRUCTURES, {filter: (structure) => structure.structureType == STRUCTURE_TOWER}).length ?
+                    freshWallTarget(creep) : repairTarget(creep);
+
+            if (target && functions.moveTo(creep, target, 3)) {
+                if (functions.moveTo(creep, target, 3)) {
+                    creep.repair(target);
                 }
                 return true;
             }
@@ -134,7 +153,7 @@ export const functions = {
      */
     getTarget: (target: StructureTarget) => target && target.type ? target.type == STRUCTURE_STORAGE ?
         Game.rooms[target.description].storage :
-        Game.getObjectById(<Id<AnyStoreStructure>> target.description) : undefined,
+        Game.getObjectById(target.description as Id<AnyStoreStructure>) : undefined,
     
     /**
      * 向指定目标移动Creep
@@ -160,7 +179,7 @@ export const functions = {
      * @param creep 执行任务的Creep
      */
     rawHarvest: (creep: Creep) => {
-        var source = Game.getObjectById(<Id<Source>> creep.memory.station['sourceID']);
+        var source = Game.getObjectById(creep.memory.station['sourceID'] as Id<Source>);
         if (!source || source.energy == 0) {
             source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
             if (!source) {
@@ -172,4 +191,39 @@ export const functions = {
             creep.harvest(source);
         }
     },
+}
+
+var freshWallTarget = (creep: Creep) => {
+    var station = creep.memory.station;
+    var lastFresh = station['lastFresh'] as number;
+    lastFresh = lastFresh ? lastFresh : 0;
+    if ((Game.time - lastFresh > 0x100) || !station['targetID']) {
+        var targets = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => (structure.structureType == STRUCTURE_WALL ||
+                    structure.structureType == STRUCTURE_RAMPART) &&
+                    structure.hits < structure.hitsMax 
+        });
+
+        var hitsMin = targets[0];
+        targets.forEach((wall) => hitsMin = hitsMin.hits < wall.hits ? hitsMin : wall);
+        if (!hitsMin) {
+            return undefined;
+        }
+        station['targetID'] = hitsMin.id;
+        return hitsMin;
+    }
+    return Game.getObjectById(station['targetID'] as Id<StructureWall | StructureRampart>);
+}
+
+var repairTarget = (creep: Creep) => {
+    var station = creep.memory.station;
+    var target = Game.getObjectById(station['targetID'] as Id<AnyStructure>);
+    if (!target || target.hits == target.hitsMax) {
+        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (structure) => structure.structureType != STRUCTURE_WALL &&
+                    structure.structureType != STRUCTURE_RAMPART &&
+                    structure.hits < structure.hitsMax
+        });
+    }
+    return target;
 }

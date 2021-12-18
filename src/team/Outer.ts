@@ -21,81 +21,81 @@ import { Team } from '@/team/Team'
 
 // 目前使用硬编码
 var roleBehaviors: {[role: string]: RoleBehavior} = {
-    worker: new RoleBehavior((creep) => {
-        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-        if (station.working) {
-            var roads = creep.pos.findInRange(FIND_STRUCTURES, 3, {
-                filter: (structure) => structure.structureType == STRUCTURE_ROAD &&
-                        structure.hits < structure.hitsMax
-            });
-            if (roads.length) {
-                creep.repair(roads[0]);
-            }
-
-            if (creep.room != Game.rooms.E24S53) {
-                var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                if (target) {
-                    if (functions.moveTo(creep, target, 3)) {
-                        creep.build(target);
-                    }
-                    return;
+    worker: {
+        run(creep): void {
+            var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+            if (station.working) {
+                var roads = creep.pos.findInRange(FIND_STRUCTURES, 3, {
+                    filter: (structure) => structure.structureType == STRUCTURE_ROAD &&
+                            structure.hits < structure.hitsMax
+                });
+                if (roads.length) {
+                    creep.repair(roads[0]);
                 }
+
+                if (creep.room != Game.rooms.E24S53) {
+                    var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                    if (target) {
+                        if (functions.moveTo(creep, target, 3)) {
+                            creep.build(target);
+                        }
+                        return;
+                    }
+                }
+
+                var store = Game.rooms.E24S53.storage;
+                if (functions.moveTo(creep, store, 1)) {
+                    creep.transfer(store, RESOURCE_ENERGY)
+                }
+
+                return;
             }
 
-            var store = Game.rooms.E24S53.storage;
-            if (functions.moveTo(creep, store, 1)) {
-                creep.transfer(store, RESOURCE_ENERGY)
+            if (creep.room != Game.rooms.E23S53) {
+                creep.moveTo(Game.flags.entrance)
+                return
             }
-
-            return;
+            var source = Game.getObjectById('5bbcae4b9099fc012e638b55' as Id<Source>);
+            if (functions.moveTo(creep, source, 1)) {
+                creep.harvest(source);
+            }
         }
-
-        if (creep.room != Game.rooms.E23S53) {
-            creep.moveTo(Game.flags.entrance)
-            return
+    },
+    claimer: {
+        run(creep): void {
+            if (creep.room != Game.rooms.E23S53) {
+                creep.moveTo(Game.flags.entrance)
+                return
+            }
+            if (functions.moveTo(creep, Game.rooms.E23S53.controller, 1)) {
+                creep.reserveController(Game.rooms.E23S53.controller);
+            }
         }
-        var source = Game.getObjectById('5bbcae4b9099fc012e638b55' as Id<Source>);
-        if (functions.moveTo(creep, source, 1)) {
-            creep.harvest(source);
-        }
-    }),
-    claimer: new RoleBehavior((creep) => {
-        if (creep.room != Game.rooms.E23S53) {
-            creep.moveTo(Game.flags.entrance)
-            return
-        }
-        if (functions.moveTo(creep, Game.rooms.E23S53.controller, 1)) {
-            creep.reserveController(Game.rooms.E23S53.controller);
-        }
-    })
+    }
 }
 
 export class Outer extends Team {
     init(): boolean {
         //TODO
-    this.memory.creeps.worker1 = {
-        name: 'worker1',
-        role: 'worker',
-        alive: {
-            work: undefined
-        },
-        body: [{
-            unit: [WORK, CARRY, MOVE],
-            repeat: 4
-        }],
-        autoRespawn: true
-    }
-    return this.memory.inited = true;
+        return this.memory.inited = true;
     }
 
     doTask(): void {
         //TODO
-        _.forEach(this.memory.creeps, (description) => {
-            var creep = Game.creeps[description.alive.work];
+        _.forEach(this.memory.creeps, (description, name) => {
+            var creep = this.creeps[name];
             if (!creep) {
                 return;
             }
-            roleBehaviors[description.role].run(creep);
+            roleBehaviors[description.role].run(creep, description);
         });
+    }
+
+    getBodyparts(role: Role, costMax?: number): BodyPartConstant[] {
+        throw new Error('Method not implemented.');
+    }
+
+    update(): void {
+        throw new Error('Method not implemented.');
     }
 }

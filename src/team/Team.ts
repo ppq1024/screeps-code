@@ -18,21 +18,21 @@
 import { builder } from '@/creep/role/builder';
 import { carrier } from '@/creep/role/carrier';
 import { harvester } from '@/creep/role/harvester';
-import { repairer } from '@/creep/role/repairer';
 import { upgrader } from '@/creep/role/upgrader';
 import { harvest } from '@/creep/task/harvest';
 import { carry } from '@/creep/task/carry';
 import { TaskExcutor } from '@/creep/task/TaskExcutor';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 import { cleaner } from '@/creep/role/cleaner';
+import { supplier } from '@/creep/role/supplier';
 
 const roleBehaviors: {[role: string]: RoleBehavior} = {
     harvester: harvester,
     carrier: carrier,
     builder: builder,
-    repairer: repairer,
     upgrader: upgrader,
-    cleaner: cleaner
+    cleaner: cleaner,
+    supplier: supplier
 }
 
 const tasks: {[type: string]: TaskExcutor} = {
@@ -40,7 +40,7 @@ const tasks: {[type: string]: TaskExcutor} = {
     carry: carry
 }
 
-export class Team {
+export abstract class Team {
     memory: TeamMemory
 
     name: string
@@ -59,7 +59,7 @@ export class Team {
         this.room = Game.rooms[memory.room];
         this.creeps = {}
         _.forEach(memory.creeps, (description, name) => {
-            this.creeps[name] = Game.creeps[description.alive.work];
+            this.creeps[name] = Game.creeps[description.alive];
         });
     }
 
@@ -89,40 +89,66 @@ export class Team {
                 return;
             }
     
-            roleBehaviors[description.role].run(creep);
+            roleBehaviors[description.role].run(creep, description);
         });
     }
 
     spawn(): void {
         _.forEach(this.memory.creeps, (description) => {
-            var creep = Game.creeps[description.alive.work];
-            if (description.autoRespawn && 
-                !(creep || description.advance && creep.ticksToLive > description.advance) &&
-                !description.alive.substitute
-            ) {
-                //添加到队列
-                var creepName = this.name + '_' + description.name + '_' + Game.time;
-                Memory.spawns[this.memory.spawner][description.important ? 'priorQueue' : 'queue'].push({name:creepName,body:description.body});
-                description.alive.substitute = creepName;
-                console.log('Prepare to respawn creep:', creepName);
+            var creep = Game.creeps[description.alive];
+            if (description.autoRespawn && !creep && !description.respawned) {
+                Memory.spawns[this.memory.spawner][description.important ? 'priorQueue' : 'queue']
+                        .push({name: description.alive, body: description.body});
+                description.respawned = true;
+                console.log('Prepare to respawn creep:', description.alive);
+                return;
             }
-    
-            var substitute = Game.creeps[description.alive.substitute];
-            if (!creep && substitute) {
-                delete Memory.creeps[description.alive.work];
-                description.alive.work = description.alive.substitute;
-                description.alive.substitute = undefined;
+            if (creep && description.respawned) {
+                description.respawned = false;
             }
         });
     }
 
-    createCreep(name: string, role: Role, opts?: {}): void {
-        var creepName = this.name + '_' + role + '_' + name;
-        this.memory.creeps[creepName] = {
-            name: creepName,
-            role: role,
-            alive: {},
-            body:[]
+    createCreep(name: string, role: Role, opts?: {}): boolean {
+        if (this.memory.creeps[name]) {
+            console.log('This creep already exists.')
+            return false;
         }
+
+        if (!opts) opts = {}
+
+        var description = opts['description'] as CreepDescription;
+        if (!description) description = {} as CreepDescription;
+        var creepName = this.name + '_' + role + '_' + name;
+        description.name = name;
+        description.role = role;
+        description.alive = creepName;
+        description.body = description.body ? description.body : this.getBodyparts(role, opts['costMax']);
+        description.autoRespawn = true;
+        this.memory.creeps[name] = description;
+
+        console.log('Add creep: ', creepName);
+        return true;
     }
+
+    deleteCreep(name: string): boolean {
+        var description = this.memory.creeps[name];
+        if (!description) return false;
+        var creepName = this.name + '_' + description.role + '_' + name;
+        var creep = this.creeps[name];
+        if (creep) creep.suicide();
+        delete this.memory.creeps[name];
+        
+        console.log('Delete creep: ', creepName);
+        return true;
+    }
+
+    abstract getBodyparts(role: Role, costMax?: number): BodyPartConstant[]
+
+    /**
+     * 更新team状态
+     * 
+     * 主要是静态任务搜索和creep升级
+     */
+    abstract update(): void
 }

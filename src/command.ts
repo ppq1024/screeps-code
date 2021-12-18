@@ -18,10 +18,12 @@
 import { Team } from "@/team/Team"
 import { Roomer } from "@/team/Roomer";
 import { Immigrant } from "@/team/Immigrant";
+import { Outer } from "@/team/Outer";
 
-var teamTypes: {[name: string]: typeof Team} = {
+var teamTypes: {[name: string]: {new (memory: TeamMemory): Team}} = {
     roomer: Roomer,
-    immigrant: Immigrant
+    immigrant: Immigrant,
+    outer: Outer
 }
 
 var loadTeamsFromMemory = () => {

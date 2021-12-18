@@ -17,4 +17,55 @@
 
 import { Team } from '@/team/Team'
 
-export class Roomer extends Team {}
+const workerUnit = [WORK, CARRY, MOVE];
+const workerUnitCost = 200;
+const fullHarvester = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+const fullHarvesterCost = 700;
+const carrierUnit = [CARRY, CARRY, MOVE];
+const carrierUnitCost = 150;
+const halfUpgrader = fullHarvester;
+const halfUpgraderCost = fullHarvesterCost;
+const fullUpgrader = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];
+const fullUpgraderCost = 1300;
+const cleanerUnit = carrierUnit;
+const cleanerUnitCost = carrierUnitCost;
+
+const getBodyparts = (unit: BodyPartConstant[], unitCost: number, costMax: number) => {
+    var unitCount = Math.floor(costMax / unitCost);
+    var bodyparts: BodyPartConstant[] = []
+    for (var i = 0; i < unitCount; i++) {
+        bodyparts.push(...unit);
+    }
+    return bodyparts;
+}
+
+const roleBodyparts: {[role: string]: (costMax: number) => BodyPartConstant[]} = {
+    worker: (costMax) => getBodyparts(workerUnit, workerUnitCost, costMax),
+    harvester: (costMax) => costMax < fullHarvesterCost ?
+            getBodyparts(workerUnit, workerUnitCost, costMax) :
+            fullHarvester,
+    carrier: (costMax) => getBodyparts(carrierUnit, carrierUnitCost, costMax),
+    supplier: (costMax) => getBodyparts(carrierUnit, carrierUnitCost, costMax),
+    builder: (costMax) => getBodyparts(workerUnit, workerUnitCost, costMax),
+    upgrader: (costMax) => costMax < halfUpgraderCost ?
+            getBodyparts(workerUnit, workerUnitCost, costMax) :
+            costMax < fullUpgraderCost ? halfUpgrader : fullUpgrader,
+    cleaner: (costMax) => getBodyparts(cleanerUnit, cleanerUnitCost, costMax),
+}
+
+export class Roomer extends Team {
+
+    doTask(): void {
+        //TODO 自动状态更新
+        super.doTask();
+    }
+
+    getBodyparts(role: Role, costMax?: number): BodyPartConstant[] {
+        costMax = costMax ? costMax : this.spawner.room.energyCapacityAvailable;
+        return roleBodyparts[role](costMax);
+    }
+
+    update(): void {
+        
+    }
+}

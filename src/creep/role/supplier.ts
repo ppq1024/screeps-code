@@ -19,18 +19,18 @@ import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
 /**
- * 定点运输
+ * 主要为spawn、extension和tower进行能量供应
  */
-class RoleCarrier extends RoleBehavior {
-    run(creep: Creep, description: CreepDescription, _room?: Room): void {
-        var resource = description['resource'];
-        var station = functions.check.checkStation(creep, resource);
-        var target = Game.getObjectById((station.working ?
-            description['targetID'] : description['sourceID']) as Id<AnyStoreStructure>);
-        if (functions.moveTo(creep, target, 1)) {
-            station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
+class RoleSupplier extends RoleBehavior {
+    run(creep: Creep, _description: CreepDescription, _room?: Room): void {
+        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+        if (!(station.working && (
+                functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION) || 
+                functions.work.supply(creep, STRUCTURE_TOWER)
+        ))) {
+            functions.preparation.getResource(creep, RESOURCE_ENERGY);
         }
     }
 }
 
-export const carrier = new RoleCarrier();
+export const supplier = new RoleSupplier();

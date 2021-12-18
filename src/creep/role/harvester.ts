@@ -18,13 +18,31 @@
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION)) &&
-        creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    ) {
-        functions.rawHarvest(creep);
+/**
+ * 严格遵守挖运分离
+ */
+class RoleHarvester extends RoleBehavior {
+    run(creep: Creep, description: CreepDescription, _room?: Room): void {
+
+        var source = Game.getObjectById(<Id<Source | Mineral>> description['sourceID']);
+        var target = Game.getObjectById(<Id<AnyStoreStructure>> description['targetID']);
+
+        var resource = source instanceof Source ? RESOURCE_ENERGY : source.mineralType;
+
+        if (creep.store.getFreeCapacity() == 0) {
+            if (!functions.moveTo(creep, target, 1)) {
+                return;
+            }
+            var result = creep.transfer(target, resource);
+            if (result == ERR_FULL) {
+                return;
+            }
+        }
+
+        if (functions.moveTo(creep, source, 1)) {
+            creep.harvest(source);
+        }
     }
 }
 
-export const harvester = new RoleBehavior(run);
+export const harvester = new RoleHarvester();

@@ -15,12 +15,6 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export class RoleBehavior {
-    constructor(
-        run: (creep: Creep, room?: Room) => void
-    ) {
-        this.run = run;
-    }
-
-    run: (creep: Creep, room?: Room) => void
+export abstract class RoleBehavior {
+    abstract run(creep: Creep, description: CreepDescription, room?: Room): void
 }

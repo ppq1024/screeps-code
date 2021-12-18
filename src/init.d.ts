@@ -40,7 +40,7 @@ interface SpawnMemory {
 
 interface SpawnRequest {
     name: string
-    body: BodyUnit[]
+    body: BodyPartConstant[]
 }
 
 interface Memory {
@@ -106,20 +106,17 @@ interface TeamMemory {
 interface CreepDescription {
     name: string
     role: Role
-    alive: {
-        work?: string
-        substitute?: string
-    }
-    body: BodyUnit[]
+    alive: string
+    body: BodyPartConstant[]
     task?: Task
     autoRespawn?: boolean
-    advance?: number
+    respawned?: boolean
     important?: boolean
 }
 
 type TeamType = 'roomer' | 'outer' | 'immigrant'
 type TaskType = 'harvest' | 'carry' | 'observe'
-type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner'
+type Role = 'harvester' | 'builder' | 'carrier' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner' | 'supplier'
 
 interface StructureTarget {
     type: StructureConstant
