@@ -34,7 +34,7 @@ class RoleCleaner extends RoleBehavior {
         }
 
         var target = Game.getObjectById(station['targetID'] as Id<Resource | Tombstone | Ruin>);
-        if (!target) {
+        if (!target || !(target instanceof Resource) && !(target as Tombstone | Ruin).store.getUsedCapacity()) {
             station['targetID'] = undefined;
             if ((target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES)) ||
                 (target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
