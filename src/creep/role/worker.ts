@@ -30,7 +30,6 @@ class RoleWorker extends RoleBehavior {
             if (room.controller.ticksToDowngrade > 1000) {
                 var target = Game.getObjectById(<Id<ConstructionSite>> station['targetID']);
                 if (!target) {
-                    station['targetID'] = undefined;
                     target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                     if (target) {
                         station['targetID'] = target.id;

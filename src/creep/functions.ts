@@ -210,6 +210,7 @@ var freshWallTarget = (creep: Creep) => {
             return undefined;
         }
         station['targetID'] = hitsMin.id;
+        station['lastFresh'] = Game.time;
         return hitsMin;
     }
     return Game.getObjectById(station['targetID'] as Id<StructureWall | StructureRampart>);
