@@ -25,8 +25,12 @@ class RoleCarrier extends RoleBehavior {
     run(creep: Creep, description: CreepDescription, _room?: Room): void {
         var resource = description['resource'];
         var station = functions.check.checkStation(creep, resource);
-        var target = Game.getObjectById((station.working ?
-            description['targetID'] : description['sourceID']) as Id<AnyStoreStructure>);
+        var source = Game.getObjectById(description['sourceID'] as Id<AnyStoreStructure>);
+        var target = Game.getObjectById(description['targetID'] as Id<AnyStoreStructure>);
+        if (target.store.getFreeCapacity(resource) == 0) {
+            return;
+        }
+        target = station.working ? target : source;
         if (functions.moveTo(creep, target, 1)) {
             station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
         }

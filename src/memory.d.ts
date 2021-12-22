@@ -15,8 +15,36 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const teamController = {
-    run: () => {
-        _.forEach(Game.teams, (team) => team.run());
+interface Memory {
+    home: string
+    staticTask: { [name: string]: Task }
+    links: LinkTask[]
+    teams: {
+        [name: string]: TeamMemory
     }
+    stats: Stats
+}
+
+interface CreepMemory {
+    station?: WorkStation
+}
+
+interface SpawnMemory {
+    priorQueue: SpawnRequest[]
+    queue: SpawnRequest[]
+}
+
+interface TeamMemory {
+    name: string
+    type: TeamType
+    inited?: boolean
+    room?: string
+    spawner: string
+    creeps: {
+        [name: string]: CreepDescription
+    }
+}
+
+interface LabMemory {
+    
 }

@@ -16,12 +16,7 @@
  */
 
 interface Game {
-    createCreep(): void
     teams: {[name: string]: Team}
-}
-
-interface CreepMemory {
-    station?: WorkStation
 }
 
 interface WorkStation {
@@ -29,28 +24,9 @@ interface WorkStation {
     target?: StructureTarget
 }
 
-interface RoomMemory {
-    sources: Source[]
-}
-
-interface SpawnMemory {
-    priorQueue: SpawnRequest[]
-    queue: SpawnRequest[]
-}
-
 interface SpawnRequest {
     name: string
     body: BodyPartConstant[]
-}
-
-interface Memory {
-    home: string
-    staticTask: { [name: string]: Task }
-    links: LinkTask[]
-    teams: {
-        [name: string]: TeamMemory
-    }
-    stats: Stats
 }
 
 interface Stats {
@@ -92,17 +68,6 @@ interface Team {
     run(): void
 }
 
-interface TeamMemory {
-    name: string
-    type: TeamType
-    inited?: boolean
-    room?: string
-    spawner: string
-    creeps: {
-        [name: string]: CreepDescription
-    }
-}
-
 interface CreepDescription {
     name: string
     role: Role
@@ -112,6 +77,9 @@ interface CreepDescription {
     autoRespawn?: boolean
     respawned?: boolean
     important?: boolean
+    boost?: boolean
+    labID?: Id<StructureLab>
+    spawner?: string
 }
 
 type TeamType = 'roomer' | 'outer' | 'immigrant'
@@ -136,6 +104,7 @@ interface BodyUnit {
 }
 
 interface LinkTask {
-    sourceID: string
-    targetID: string
+    sourceID: Id<StructureLink>
+    targetID: Id<StructureLink>
+    emptyOnly: boolean
 }

@@ -27,8 +27,10 @@ class RoleCleaner extends RoleBehavior {
         var station = creep.memory.station;
         if (!station) station = creep.memory.station = {}
 
+        station.working = (station.working ? !creep.store.getFreeCapacity() : !creep.store.getUsedCapacity()) ?
+                !station.working : station.working;
 
-        if (!creep.store.getFreeCapacity()) {
+        if (!station.working) {
             this.store(creep, room);
             return;
         }

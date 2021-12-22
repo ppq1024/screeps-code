@@ -25,6 +25,7 @@ import { TaskExcutor } from '@/creep/task/TaskExcutor';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 import { cleaner } from '@/creep/role/cleaner';
 import { supplier } from '@/creep/role/supplier';
+import { functions } from '@/creep/functions';
 
 const roleBehaviors: {[role: string]: RoleBehavior} = {
     harvester: harvester,
@@ -38,6 +39,16 @@ const roleBehaviors: {[role: string]: RoleBehavior} = {
 const tasks: {[type: string]: TaskExcutor} = {
     harvest: harvest,
     carry: carry
+}
+
+function boost(creep: Creep, lab: StructureLab): boolean {
+    if (!lab.store[lab.mineralType]) return false; //没有东西就不要强化了好吧
+    if (creep.body.some((bodyPart, _index, _array) => bodyPart.boost == lab.mineralType)) return false;
+    if (lab && functions.moveTo(creep, lab, 1)) {
+        lab.boostCreep(creep) == OK;
+    }
+
+    return true;
 }
 
 export abstract class Team {
@@ -83,6 +94,11 @@ export abstract class Team {
             var task = description.task;
 
             if (!creep) return;
+
+            if (description.boost) {
+                var lab = Game.getObjectById(description.labID);
+                if (lab && boost(creep, lab)) return;
+            }
     
             if (task) {
                 tasks[task.type].run(creep, task);
@@ -97,7 +113,8 @@ export abstract class Team {
         _.forEach(this.memory.creeps, (description) => {
             var creep = Game.creeps[description.alive];
             if (description.autoRespawn && !creep && !description.respawned) {
-                Memory.spawns[this.memory.spawner][description.important ? 'priorQueue' : 'queue']
+                var spawnerName = description.spawner ? description.spawner : this.memory.spawner;
+                Memory.spawns[spawnerName][description.important ? 'priorQueue' : 'queue']
                         .push({name: description.alive, body: description.body});
                 description.respawned = true;
                 console.log('Prepare to respawn creep:', description.alive);

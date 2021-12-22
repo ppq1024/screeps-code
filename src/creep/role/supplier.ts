@@ -22,14 +22,17 @@ import { RoleBehavior } from '@/creep/role/RoleBehavior';
  * 主要为spawn、extension和tower进行能量供应
  */
 class RoleSupplier extends RoleBehavior {
-    run(creep: Creep, _description: CreepDescription, _room?: Room): void {
+    run(creep: Creep, description: CreepDescription, _room?: Room): void {
         var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-        if (!(station.working && (
-                functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION) || 
-                functions.work.supply(creep, STRUCTURE_TOWER)
-        ))) {
-            functions.preparation.getResource(creep, RESOURCE_ENERGY);
+        var target = description['target'] as StructureConstant[];
+        if (!target || !target.length) target = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]
+
+        if (station.working) {
+            functions.work.supply(creep, ...target);
+            return;
         }
+
+        functions.preparation.getResource(creep, RESOURCE_ENERGY);
     }
 }
 
