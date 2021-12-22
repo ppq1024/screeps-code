@@ -15,6 +15,34 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TeamBehavior } from '@/team/TeamBehavior';
+import { Team } from "@/team/Team"
+import { Roomer } from "@/team/Roomer";
+import { Immigrant } from "@/team/Immigrant";
+import { Outer } from "@/team/Outer";
 
-export const roomer = new TeamBehavior();
+var teamTypes: {[name: string]: {new (memory: TeamMemory): Team}} = {
+    roomer: Roomer,
+    immigrant: Immigrant,
+    outer: Outer
+}
+
+var loadTeamsFromMemory = () => {
+    Game.teams = {};
+    var teams = Memory.teams;
+    if (!teams) Memory.teams = {}
+
+    _.forEach(teams, (memory, name) => {
+        Game.teams[name] = new teamTypes[memory.type](memory);
+    })
+}
+
+var loadCommands = () => {
+    //TODO
+}
+
+export const command =  {
+    init: () => {
+        loadTeamsFromMemory();
+        loadCommands();
+    }
+}

@@ -15,33 +15,36 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TeamBehavior } from '@/team/TeamBehavior';
-
-var init = (team: Team) => {
-    //TODO
-    team.creeps.worker1 = {
-        name: 'worker1',
-        role: 'worker',
-        alive: {
-            work: undefined
-        },
-        body: [{
-            unit: [WORK, CARRY, MOVE],
-            repeat: 8
-        }],
-        autoRespawn: true
+interface Memory {
+    home: string
+    staticTask: { [name: string]: Task }
+    links: LinkTask[]
+    teams: {
+        [name: string]: TeamMemory
     }
-    return team.inited = true;
+    stats: Stats
 }
 
-var doTask = (team: Team) => {
-    //TODO
-    _.forEach(team.creeps, (description) => {
-
-    });
+interface CreepMemory {
+    station?: WorkStation
 }
 
-export const outer = new TeamBehavior({
-    init: init,
-    doTask: doTask,
-});
+interface SpawnMemory {
+    priorQueue: SpawnRequest[]
+    queue: SpawnRequest[]
+}
+
+interface TeamMemory {
+    name: string
+    type: TeamType
+    inited?: boolean
+    room?: string
+    spawner: string
+    creeps: {
+        [name: string]: CreepDescription
+    }
+}
+
+interface LabMemory {
+    
+}

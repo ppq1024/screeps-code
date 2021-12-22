@@ -18,9 +18,11 @@
 export const link = {
     run: () => {
         Memory.links.forEach((linkTask) => {
-            var source = Game.getObjectById(<Id<StructureLink>> linkTask.sourceID);
-            var target = Game.getObjectById(<Id<StructureLink>> linkTask.targetID);
-            if (source.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+            var source = Game.getObjectById(linkTask.sourceID);
+            var target = Game.getObjectById(linkTask.targetID);
+            if (source.store.getFreeCapacity(RESOURCE_ENERGY) == 0 &&
+                (!linkTask.emptyOnly || !target.store.energy)
+            ) {
                 source.transferEnergy(target);
             }
         });

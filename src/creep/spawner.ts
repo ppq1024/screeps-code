@@ -15,27 +15,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var expand = (bodyUnit: BodyUnit, dest?: BodyPartConstant[]) => {
-    dest = dest ? dest : [];
-    for (var i = 0; i < bodyUnit.repeat; i++) {
-        dest.push(...bodyUnit.unit);
-    }
-    return dest;
-}
-
-var parseBody = (body: BodyUnit[]) => {
-    var result: BodyPartConstant[] = [];
-    body.forEach((bodyUnit) => expand(bodyUnit, result));
-    return result;
-}
-
 var spawnQueue = (spawner: StructureSpawn, queue: SpawnRequest[]) => {
     if (!queue.length) {
         return false;
     }
 
     var request = queue[0];
-    var body = parseBody(request.body);
+    var body = request.body;
     if (spawner.spawnCreep(body, request.name, {dryRun: true}) == OK) {
         spawner.spawnCreep(body, request.name);
         queue.shift();

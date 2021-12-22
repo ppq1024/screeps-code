@@ -18,14 +18,23 @@
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var run = (creep: Creep) => {
-    var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
-    if (!(station.working && (
-            functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION) || 
-            functions.work.supply(creep, STRUCTURE_TOWER)
-    ))) {
-        functions.preparation.getResource(creep, RESOURCE_ENERGY);
+/**
+ * 定点运输
+ */
+class RoleCarrier extends RoleBehavior {
+    run(creep: Creep, description: CreepDescription, _room?: Room): void {
+        var resource = description['resource'];
+        var station = functions.check.checkStation(creep, resource);
+        var source = Game.getObjectById(description['sourceID'] as Id<AnyStoreStructure>);
+        var target = Game.getObjectById(description['targetID'] as Id<AnyStoreStructure>);
+        if (target.store.getFreeCapacity(resource) == 0) {
+            return;
+        }
+        target = station.working ? target : source;
+        if (functions.moveTo(creep, target, 1)) {
+            station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
+        }
     }
 }
 
-export const carrier = new RoleBehavior(run);
+export const carrier = new RoleCarrier();

@@ -15,8 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface CreepMemory {
-    station?: WorkStation
+interface Game {
+    teams: {[name: string]: Team}
 }
 
 interface WorkStation {
@@ -24,28 +24,9 @@ interface WorkStation {
     target?: StructureTarget
 }
 
-interface RoomMemory {
-    sources: Source[]
-}
-
-interface SpawnMemory {
-    priorQueue: SpawnRequest[]
-    queue: SpawnRequest[]
-}
-
 interface SpawnRequest {
     name: string
-    body: BodyUnit[]
-}
-
-interface Memory {
-    home: string
-    staticTask: { [name: string]: Task }
-    links: LinkTask[]
-    teams: {
-        [name: string]: Team
-    }
-    stats: Stats
+    body: BodyPartConstant[]
 }
 
 interface Stats {
@@ -76,37 +57,39 @@ interface RoomStats {
 }
 
 interface Team {
+    memory: TeamMemory
     name: string
     type: TeamType
-    inited?: boolean
-    room?: string
-    spawner: string
     creeps: {
-        [name: string]: CreepDescription
+        [name: string]: Creep
     }
+    spawner: StructureSpawn
+    room: Room
+    run(): void
 }
 
 interface CreepDescription {
     name: string
     role: Role
-    alive: {
-        work?: string
-        substitute?: string
-    }
-    body: BodyUnit[]
+    alive: string
+    body: BodyPartConstant[]
     task?: Task
     autoRespawn?: boolean
-    advance?: number
+    respawned?: boolean
     important?: boolean
+    boost?: boolean
+    labID?: Id<StructureLab>
+    spawner?: string
 }
 
 type TeamType = 'roomer' | 'outer' | 'immigrant'
 type TaskType = 'harvest' | 'carry' | 'observe'
-type Role = 'harvester' | 'builder' | 'carrier' | 'repairer' | 'upgrader' | 'observer' | 'worker' | 'claimer'
+type Role = 'harvester' | 'builder' | 'carrier' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner' | 'supplier'
 
 interface StructureTarget {
     type: StructureConstant
     description?: string
+    flag?: string
 }
 
 interface WorkerTask extends Task {
@@ -121,6 +104,7 @@ interface BodyUnit {
 }
 
 interface LinkTask {
-    sourceID: string
-    targetID: string
+    sourceID: Id<StructureLink>
+    targetID: Id<StructureLink>
+    emptyOnly: boolean
 }

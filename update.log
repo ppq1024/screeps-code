@@ -22,4 +22,19 @@ v0.2.1
         * 未设置目标距离导致rawHarvest无法正常工作
         * harvester的默认逻辑中没有可供给建筑时能量采满不会停止采集
         * repairer在刷墙模式下且房间内没有墙时报NPE
-        
+
+v0.3
+    * 重构Team系统，会在tick开始时从内存初始化Team对象
+    * 对职业系统进行修改
+        * 将carrier的默认逻辑作为supplier独立出来
+        * builder在空闲时不再升级而是维修或刷墙
+        * repairer的逻辑已转移至builder中
+        * 添加cleaner来回收墓碑、废墟和掉落的资源
+        * 添加worker来进行前期工作，顺序为供应->修建->升级
+    * 添加市场相关逻辑（部分硬编码）
+    * 将内存相关的类型声明文件独立出来
+    * link任务添加emptyOnly参数，仅当目标link为空时才会传输
+    * 添加简单boost逻辑
+    * 添加简单多spawn逻辑
+    * 修复部分bug（具体记不清了）
+

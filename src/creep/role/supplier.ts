@@ -19,30 +19,21 @@ import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
 /**
- * 严格遵守挖运分离
+ * 主要为spawn、extension和tower进行能量供应
  */
-class RoleHarvester extends RoleBehavior {
+class RoleSupplier extends RoleBehavior {
     run(creep: Creep, description: CreepDescription, _room?: Room): void {
+        var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
+        var target = description['target'] as StructureConstant[];
+        if (!target || !target.length) target = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]
 
-        var source = Game.getObjectById(<Id<Source | Mineral>> description['sourceID']);
-        var target = Game.getObjectById(<Id<AnyStoreStructure>> description['targetID']);
-
-        var resource = source instanceof Source ? RESOURCE_ENERGY : source.mineralType;
-
-        if (creep.store.getFreeCapacity() == 0) {
-            if (!functions.moveTo(creep, target, 1)) {
-                return;
-            }
-            var result = creep.transfer(target, resource);
-            if (result == ERR_FULL) {
-                return;
-            }
+        if (station.working) {
+            functions.work.supply(creep, ...target);
+            return;
         }
 
-        if (functions.moveTo(creep, source, 1)) {
-            creep.harvest(source);
-        }
+        functions.preparation.getResource(creep, RESOURCE_ENERGY);
     }
 }
 
-export const harvester = new RoleHarvester();
+export const supplier = new RoleSupplier();

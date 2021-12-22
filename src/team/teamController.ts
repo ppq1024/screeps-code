@@ -15,19 +15,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {roomer} from '@/team/type/roomer';
-import {outer} from '@/team/type/outers';
-import { immigrant } from '@/team/type/immigrant';
-import { TeamBehavior } from '@/team/TeamBehavior';
-
-const teamBehaviours: {[name: string]:TeamBehavior} = {
-    roomer: roomer,
-    outer: outer,
-    immigrant: immigrant
-}
-
 export const teamController = {
     run: () => {
-        _.forEach(Memory.teams, (team) => teamBehaviours[team.type].run(team));
+        _.forEach(Game.teams, (team) => team.run());
     }
 }

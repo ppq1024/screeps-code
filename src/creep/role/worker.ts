@@ -18,35 +18,38 @@
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-
-
 /**
- * 建筑、前期维修和刷墙
+ * 用于前期工作
  */
-class RoleBuilder extends RoleBehavior {
+class RoleWorker extends RoleBehavior {
     run(creep: Creep, description: CreepDescription, room?: Room): void {
         var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
         room = room ? room : creep.room;
     
         if (station.working) {
-            var target = Game.getObjectById(<Id<ConstructionSite>> station['targetID']);
-            if (!target || !(target instanceof ConstructionSite)) {
-                target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                
+            if (room.controller.ticksToDowngrade > 1000) {
+                var target = Game.getObjectById(<Id<ConstructionSite>> station['targetID']);
+                if (!target) {
+                    target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                    if (target) {
+                        station['targetID'] = target.id;
+                        if (functions.moveTo(creep, target, 3)) creep.build(target);
+                        return;
+                    }
+                    
+                }
+
+                if (functions.work.repair(creep)) return;
             }
 
-            if (target) {
-                station['targetID'] = target.id;
-                if (functions.moveTo(creep, target, 3)) creep.build(target);
-                return;
-            }
-
-            functions.work.repair(creep);
+            if (functions.moveTo(creep, room.controller, 3)) creep.upgradeController(room.controller);
             return;
         }
     
-        functions.preparation.getResource(creep, RESOURCE_ENERGY)
+        if (!description['alwaysHarvest'] && functions.preparation.getResource(creep, RESOURCE_ENERGY)) return;
+    
+        functions.rawHarvest(creep);
     }
 }
 
-export const builder = new RoleBuilder();
+export const harvester = new RoleWorker();

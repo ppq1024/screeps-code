@@ -18,37 +18,38 @@
 import { functions } from '@/creep/functions';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 
-var run = (creep: Creep, room: Room) => {
-    var station = creep.memory.station;
-    if (!station) station =  creep.memory.station = {};
-    room = room ? room : creep.room;
-
-    if (creep.store.energy > 0) {
-        if (functions.moveTo(creep, room.controller, 3)) {
-            creep.upgradeController(room.controller)
+/**
+ * 只进行控制器升级
+ */
+class RoleUpgrader extends RoleBehavior {
+    run(creep: Creep, _description: CreepDescription, room?: Room): void {
+        var station = creep.memory.station;
+        if (!station) station =  creep.memory.station = {};
+        room = room ? room : creep.room;
+    
+        if (creep.store.energy) {
+            if (functions.moveTo(creep, room.controller, 3)) creep.upgradeController(room.controller);
         }
-    }
-
-    var target = functions.getTarget(station.target);
-    if (!target) {
-        target = <AnyStoreStructure> room.controller.pos.findInRange(FIND_STRUCTURES, 4, {
-            filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER ||
-                    structure.structureType == STRUCTURE_LINK ||
-                    structure.structureType == STRUCTURE_STORAGE) &&
-                    structure.store.energy > 0
-        })[0];
-        if (!target) {
-            return;
+    
+        var target = functions.getTarget(station.target);
+        if (!target || !target.store.energy) {
+            target = <AnyStoreStructure> room.controller.pos.findInRange(FIND_STRUCTURES, 4, {
+                filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER ||
+                        structure.structureType == STRUCTURE_LINK ||
+                        structure.structureType == STRUCTURE_STORAGE) &&
+                        structure.store.energy > 0
+            })[0];
+            if (!target) {
+                return;
+            }
+            station.target = {
+                type: target.structureType,
+                description: target.structureType == STRUCTURE_STORAGE ? target.room.name : target.id
+            }
         }
-        station.target = {
-            type: target.structureType,
-            description: target.structureType == STRUCTURE_STORAGE ? target.room.name : target.id
-        }
-    }
-
-    if (functions.moveTo(creep, target, 1)) {
-        creep.withdraw(target, RESOURCE_ENERGY)
+    
+        if (functions.moveTo(creep, target, 1)) creep.withdraw(target, RESOURCE_ENERGY);
     }
 }
 
-export const upgrader = new RoleBehavior(run);
+export const upgrader = new RoleUpgrader();

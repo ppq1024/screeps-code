@@ -21,15 +21,31 @@ import { spawner } from '@/creep/spawner';
 import { tower } from '@/tower';
 import { link } from '@/link';
 import { exportStats } from '@/modules/stats'
+import { command } from '@/command';
+import { market } from '@/market';
 
 var loopUnit = () => {
+    command.init();
     tower.run();
     link.run();
-    spawner.run();
     teamController.run();
+    spawner.run();
+    market.run();
 
-    if (Game.cpu.bucket >= 10000) {
-        Game.cpu.generatePixel();
+    if (Game.resources.pixel != undefined) {
+        if (Game.cpu.bucket >= 10000) {
+            Game.cpu.generatePixel();
+        }
+    
+        if (!(Game.time & 0x3fff) && Game.resources[PIXEL] > 100) {
+            var order = Game.market.getAllOrders({
+                type: ORDER_BUY,
+                resourceType: PIXEL
+            }).sort((a, b) => b.price - a.price)[0];
+            console.log('Order price: ', order.price);
+            var result = Game.market.deal(order.id, Math.min(order.remainingAmount, Game.resources[PIXEL]));
+            console.log('Order result: ', result);
+        }
     }
 
     exportStats();
