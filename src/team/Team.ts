@@ -42,7 +42,7 @@ const tasks: {[type: string]: TaskExcutor} = {
 }
 
 function boost(creep: Creep, lab: StructureLab): boolean {
-    if (!lab.store[lab.mineralType]) return false; //没有东西就不要强化了好吧
+    if (lab.store[lab.mineralType] < 30) return false; //没有东西就不要强化了好吧
     if (creep.body.some((bodyPart, _index, _array) => bodyPart.boost == lab.mineralType)) return false;
     if (lab && functions.moveTo(creep, lab, 1)) {
         lab.boostCreep(creep) == OK;

@@ -18,34 +18,12 @@
 export const market = {
     run() {
         var terminal = Game.rooms.E24S53.terminal;
-        var remaining = 2000 - terminal.store.GH2O;
-        if (remaining > 0 && !terminal.cooldown) { 
-            var order = Game.market.getAllOrders({
-                type: ORDER_SELL,
-                resourceType: 'GH2O'
-            }).sort((a, b) => a.price - b.price)[0];
-            console.log('Order price: ', order.price);
-            var result = Game.market.deal(order.id, Math.min(order.remainingAmount, 2000), 'E24S53');
-            console.log('Order result: ', result);
-        }
-    
         var energyOrder = Game.market.getOrderById('61c29aa6145569c2dac0c14f');
         if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
             Game.market.extendOrder(energyOrder.id, 50000);
         }
     
         var terminal = Game.rooms.E23S52.terminal;
-        var remaining = 2000 - terminal.store.GH2O;
-        if (remaining > 0 && !terminal.cooldown) { 
-            var order = Game.market.getAllOrders({
-                type: ORDER_SELL,
-                resourceType: 'GH2O'
-            }).sort((a, b) => a.price - b.price)[0];
-            console.log('Order price: ', order.price);
-            var result = Game.market.deal(order.id, Math.min(order.remainingAmount, 2000), 'E23S52');
-            console.log('Order result: ', result);
-        }
-        
         var energyOrder = Game.market.getOrderById('61c2cb6e1455693a7ad10818');
         if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
             Game.market.extendOrder(energyOrder.id, 50000);

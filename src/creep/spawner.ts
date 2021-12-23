@@ -35,6 +35,9 @@ var spawnQueue = (spawner: StructureSpawn, queue: SpawnRequest[]) => {
 export const spawner = {
     run: function () {
         _.forEach(Game.spawns, (spawner) => {
+            if (!spawner.memory.priorQueue) spawner.memory.priorQueue = []
+            if (!spawner.memory.queue) spawner.memory.queue = []
+
             if (spawner.spawning) {
                 return;
             }
