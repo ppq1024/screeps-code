@@ -25,20 +25,68 @@ import { TaskExcutor } from '@/creep/task/TaskExcutor';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
 import { cleaner } from '@/creep/role/cleaner';
 import { supplier } from '@/creep/role/supplier';
+import { worker } from '@/creep/role/worker'
 import { functions } from '@/creep/functions';
 
-const roleBehaviors: {[role: string]: RoleBehavior} = {
+const roleBehaviors: Record<Role, RoleBehavior> = {
     harvester: harvester,
     carrier: carrier,
     builder: builder,
     upgrader: upgrader,
     cleaner: cleaner,
-    supplier: supplier
+    supplier: supplier,
+    worker: worker,
+    claimer: undefined,//不同地方可能不太一样
+    observer: undefined
 }
 
-const tasks: {[type: string]: TaskExcutor} = {
+const tasks: Record<TaskType, TaskExcutor> = {
     harvest: harvest,
-    carry: carry
+    carry: carry,
+    observe: undefined
+}
+
+const workerUnit = [WORK, CARRY, MOVE];
+const workerUnitCost = 200;
+const fullHarvester = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+const fullHarvesterCost = 700;
+const carrierUnit = [CARRY, CARRY, MOVE];
+const carrierUnitCost = 150;
+const halfUpgrader = fullHarvester;
+const halfUpgraderCost = fullHarvesterCost;
+const fullUpgrader = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];
+const fullUpgraderCost = 1300;
+const cleanerUnit = carrierUnit;
+const cleanerUnitCost = carrierUnitCost;
+const claimer1 = [CLAIM, MOVE];
+const claimer1Cost = 650;
+const claimer2 = [CLAIM, CLAIM, MOVE];
+const claimer2Cost = 1250;
+
+const getBodyparts = (unit: BodyPartConstant[], unitCost: number, costMax: number) => {
+    var unitCount = Math.floor(costMax / unitCost);
+    var bodyparts: BodyPartConstant[] = []
+    for (var i = 0; i < unitCount; i++) {
+        bodyparts.push(...unit);
+    }
+    return bodyparts;
+}
+
+const roleBodyparts: Record<Role, (costMax: number) => BodyPartConstant[]> = {
+    worker: (costMax) => getBodyparts(workerUnit, workerUnitCost, costMax),
+    harvester: (costMax) => costMax < fullHarvesterCost ?
+        getBodyparts(workerUnit, workerUnitCost, costMax) :
+        fullHarvester,
+    carrier: (costMax) => getBodyparts(carrierUnit, carrierUnitCost, costMax),
+    supplier: (costMax) => getBodyparts(carrierUnit, carrierUnitCost, costMax),
+    builder: (costMax) => getBodyparts(workerUnit, workerUnitCost, costMax),
+    upgrader: (costMax) => costMax < halfUpgraderCost ?
+        getBodyparts(workerUnit, workerUnitCost, costMax) :
+        costMax < fullUpgraderCost ? halfUpgrader : fullUpgrader,
+    cleaner: (costMax) => getBodyparts(cleanerUnit, cleanerUnitCost, costMax),
+    claimer: (costMax) => costMax < claimer1Cost ? [] :
+        costMax < claimer2Cost ? claimer1 : claimer2,
+    observer: (_) => [MOVE]
 }
 
 function boost(creep: Creep, lab: StructureLab): boolean {
@@ -62,6 +110,9 @@ export abstract class Team {
     spawner: StructureSpawn
     room: Room
 
+    protected roleBehaviors: Record<Role, RoleBehavior> = roleBehaviors
+    protected tasks: Record<TaskType, TaskExcutor> = tasks
+
     constructor(memory: TeamMemory) {
         this.memory = memory;
 
@@ -79,6 +130,8 @@ export abstract class Team {
             console.log('Cannot init this team: ', this.name);
             return;
         }
+
+        if (this.checkUpdate()) this.update();
 
         this.spawn();
         this.doTask();
@@ -99,14 +152,20 @@ export abstract class Team {
                 var lab = Game.getObjectById(description.labID);
                 if (lab && boost(creep, lab)) return;
             }
+
+            this.preDo(creep);
     
             if (task) {
-                tasks[task.type].run(creep, task);
+                this.tasks[task.type].run(creep, task);
                 return;
             }
     
-            roleBehaviors[description.role].run(creep, description);
+            this.roleBehaviors[description.role].run(creep, description);
         });
+    }
+
+    protected preDo(creep: Creep): void {
+        //Default do nothing
     }
 
     spawn(): void {
@@ -160,7 +219,12 @@ export abstract class Team {
         return true;
     }
 
-    abstract getBodyparts(role: Role, costMax?: number): BodyPartConstant[]
+    getBodyparts(role: Role, costMax?: number): BodyPartConstant[] {
+        costMax = costMax ? costMax : this.spawner.room.energyCapacityAvailable;
+        return roleBodyparts[role](costMax);
+    }
+
+    abstract checkUpdate(): boolean
 
     /**
      * 更新team状态

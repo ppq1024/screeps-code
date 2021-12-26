@@ -89,7 +89,7 @@ export const functions = {
             var target = creep.room.find(FIND_STRUCTURES, {filter: (structure) => structure.structureType == STRUCTURE_TOWER}).length ?
                     freshWallTarget(creep) : repairTarget(creep);
 
-            if (target && functions.moveTo(creep, target, 3)) {
+            if (target) {
                 if (functions.moveTo(creep, target, 3)) {
                     creep.repair(target);
                 }

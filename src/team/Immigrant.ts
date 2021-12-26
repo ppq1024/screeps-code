@@ -16,10 +16,28 @@
  */
 
 import { functions } from '@/creep/functions';
-import { builder } from '@/creep/role/builder';
+import { worker } from '@/creep/role/worker';
 import { RoleBehavior } from '@/creep/role/RoleBehavior';
-
 import { Team } from '@/team/Team'
+
+const workerUnit = [WORK, CARRY, MOVE];
+const workerUnitCost = 200;
+const claimer = [CLAIM, MOVE];
+const claimerCost = 650;
+
+const getBodyparts = (unit: BodyPartConstant[], unitCost: number, costMax: number) => {
+    var unitCount = Math.floor(costMax / unitCost);
+    var bodyparts: BodyPartConstant[] = []
+    for (var i = 0; i < unitCount; i++) {
+        bodyparts.push(...unit);
+    }
+    return bodyparts;
+}
+
+const roleBodyparts: {[role: string]: (costMax: number) => BodyPartConstant[]} = {
+    worker: (costMax) => getBodyparts(workerUnit, workerUnitCost, costMax),
+    claimer: (costMax) => getBodyparts(claimer, claimerCost, costMax)
+}
 
 var roleBehaviors: {[role: string]: RoleBehavior} = {
     claimer: {
@@ -34,46 +52,44 @@ var roleBehaviors: {[role: string]: RoleBehavior} = {
             }
         }
     },
-    worker: builder
+    worker: worker
 }
 
+
+
 export class Immigrant extends Team {
+
     init(): boolean {
+        var roleBehaviors = Object.assign({}, super.roleBehaviors);
+        roleBehaviors.claimer = {
+            run(creep: Creep) {
+                var target = creep.room.controller;
+                if (target.my) {
+                    return;
+                }
+    
+                if (functions.moveTo(creep, target, 1)) {
+                    creep.claimController(target);
+                }
+            }
+        }
+        this.roleBehaviors = roleBehaviors;
         return this.memory.inited = true;
     }
 
-    doTask(): void {
-        _.forEach(this.memory.creeps, (description) => {
-            var flag = Game.flags[this.name];
-            var creep = this.creeps[description.name];
-            if (!creep) {
-                return;
-            }
+    protected preDo(creep: Creep): void {
+        var flag = Game.flags[this.name];
     
-            var room = flag.room;
-            if (!room || room != creep.room) {
-                creep.moveTo(flag, {
-                    reusePath: 16,
-                    ignoreCreeps: true
-                })
-    
-                return;
-            }
-    
-            roleBehaviors[description.role].run(creep, description);
-    
-            if (room.controller.my && description.role == 'claimer') {
-                description.autoRespawn = false;
-            }
-    
-            if (room.controller.level >= 4) {
-                description.autoRespawn = false;
-            }
-        });
+        var room = flag.room;
+        if (!room || room != creep.room) {
+            creep.moveTo(flag)
+
+            return;
+        }
     }
 
-    getBodyparts(role: Role, costMax?: number): BodyPartConstant[] {
-        throw new Error('Method not implemented.');
+    checkUpdate(): boolean {
+        return false;
     }
     
     update(): void {

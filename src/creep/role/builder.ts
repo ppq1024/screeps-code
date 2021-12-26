@@ -29,10 +29,9 @@ class RoleBuilder extends RoleBehavior {
         room = room ? room : creep.room;
     
         if (station.working) {
-            var target = Game.getObjectById(<Id<ConstructionSite>> station['targetID']);
+            var target = Game.getObjectById(station['targetID'] as Id<ConstructionSite>);
             if (!target || !(target instanceof ConstructionSite)) {
                 target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                
             }
 
             if (target) {

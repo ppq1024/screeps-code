@@ -28,15 +28,18 @@ class RoleWorker extends RoleBehavior {
     
         if (station.working) {
             if (room.controller.ticksToDowngrade > 1000) {
-                var target = Game.getObjectById(<Id<ConstructionSite>> station['targetID']);
-                if (!target) {
+                if (functions.work.supply(creep, STRUCTURE_SPAWN, STRUCTURE_EXTENSION)) return;
+
+                var target = Game.getObjectById(station['targetID'] as Id<ConstructionSite>);
+
+                if (!target || !(target instanceof ConstructionSite)) {
                     target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                    if (target) {
-                        station['targetID'] = target.id;
-                        if (functions.moveTo(creep, target, 3)) creep.build(target);
-                        return;
-                    }
-                    
+                }
+    
+                if (target) {
+                    station['targetID'] = target.id;
+                    if (functions.moveTo(creep, target, 3)) creep.build(target);
+                    return;
                 }
 
                 if (functions.work.repair(creep)) return;
@@ -52,4 +55,4 @@ class RoleWorker extends RoleBehavior {
     }
 }
 
-export const harvester = new RoleWorker();
+export const worker = new RoleWorker();
