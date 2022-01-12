@@ -15,21 +15,12 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
-
-    _.forEach(groups)
-}
-
-var loadCommands = () => {
-    //TODO
-}
-
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+/**
+ * 
+ */
+abstract class AbstractMemorial<U extends MemoryUnit<any>> implements Memorial<U> {
+    memory: U;
+    constructor(memory: U) {
+        this.memory = memory;
     }
 }

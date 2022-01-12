@@ -24,8 +24,9 @@ interface CarryTask extends Task {
     type: 'carry'
     roleLimit: 'carrier'
     resource: ResourceConstant
-    from?: StructureTarget
-    to?: StructureTarget
+    sourceID: Id<AnyStoreStructure>
+    targetID: Id<AnyStoreStructure>
+    amount: number
 }
 
 interface HarvestTask extends Task {

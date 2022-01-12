@@ -17,11 +17,11 @@
 
 interface Game {
     teams: {[name: string]: Team}
+    groups: Record<string, Group>
 }
 
 interface WorkStation {
     working?: boolean
-    target?: StructureTarget
 }
 
 interface SpawnRequest {
@@ -56,19 +56,35 @@ interface RoomStats {
     controllerLevel: number
 }
 
+interface RoleBehavior {
+    run(creep: Creep): void
+}
+
+interface Group {
+    memory: GroupMemory
+    name: string
+    type: GroupType
+    teams: Record<string, Team>
+    structureGroups: Record<string, StructureGroup>
+
+    process(): void
+    run(): void
+}
+
 interface Team {
     memory: TeamMemory
     name: string
     type: TeamType
-    creeps: {
-        [name: string]: Creep
-    }
+    creeps: Record<string, Creep>
     spawner: StructureSpawn
     room: Room
+    roleBehaviors: Record<Role, RoleBehavior>
     run(): void
 }
 
-interface CreepDescription {
+interface Description<O> {}
+
+interface CreepDescription extends Description<Creep> {
     name: string
     role: Role
     alive: string
@@ -82,29 +98,26 @@ interface CreepDescription {
     spawner?: string
 }
 
-type TeamType = 'roomer' | 'outer' | 'immigrant'
-type TaskType = 'harvest' | 'carry' | 'observe'
-type Role = 'harvester' | 'builder' | 'carrier' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner' | 'supplier'
+interface StructureDescription extends Description<Structure> {
 
-interface StructureTarget {
-    type: StructureConstant
-    description?: string
-    flag?: string
 }
 
-interface WorkerTask extends Task {
-    name: string
-    source: Source | Mineral | Deposit | Structure
-    target: Structure | ConstructionSite | Creep
-}
+interface TeamConstructor extends MemorialConstructor<Team, TeamMemory> {}
 
-interface BodyUnit {
-    unit: BodyPartConstant[]
-    repeat: number
-}
+interface StructureGroupConstructor extends MemorialConstructor<StructureGroup, StructureGroupMemory> {}
 
 interface LinkTask {
     sourceID: Id<StructureLink>
     targetID: Id<StructureLink>
     emptyOnly: boolean
 }
+
+
+
+interface productDescription {
+    level?: number
+    amount: number
+    cooldown: number
+    components: Record<RawMaterial, number>
+}
+

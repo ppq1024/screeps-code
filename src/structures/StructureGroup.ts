@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,21 +16,22 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
+/**
+ * 
+ */
+abstract class StructureGroup extends AbstractMemorial<StructureGroupMemory> implements ControlUnit {
+    structureGroups: StructureGroup[];
 
-    _.forEach(groups)
-}
+    memory: StructureGroupMemory;
 
-var loadCommands = () => {
-    //TODO
-}
-
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+    constructor(memory: StructureGroupMemory) {
+        super(memory);
+        //TODO
     }
+
+    process(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    abstract run(): void;
 }

@@ -15,21 +15,15 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
+/**
+ * 处理房间发展的相关逻辑
+ */
+class Develop extends Group {
+    constructor(memory: GroupMemory) {
+        super(memory);
+    }
 
-    _.forEach(groups)
-}
-
-var loadCommands = () => {
-    //TODO
-}
-
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+    process(): void {
+        
     }
 }

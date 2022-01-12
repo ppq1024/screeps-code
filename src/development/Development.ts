@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,21 +16,9 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
-
-    _.forEach(groups)
-}
-
-var loadCommands = () => {
-    //TODO
-}
-
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+class Development extends Group {
+    process(): void {
+        throw new Error("Method not implemented.");
     }
+    
 }

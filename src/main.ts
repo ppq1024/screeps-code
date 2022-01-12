@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,21 +17,13 @@
  */
 
 import { errorMapper } from '@/modules/errorMapper';
-import { teamController } from '@/team/teamController';
-import { spawner } from '@/creep/spawner';
-import { tower } from '@/tower';
-import { link } from '@/link';
 import { exportStats } from '@/modules/stats'
 import { command } from '@/command';
-import { market } from '@/market';
 
 var loopUnit = () => {
     command.init();
-    tower.run();
-    link.run();
-    teamController.run();
-    spawner.run();
-    market.run();
+    _.forEach(Game.groups, (group) => group.run());
+    
 
     if (Game.resources.pixel != undefined) {
         if (Game.cpu.bucket >= 10000) {

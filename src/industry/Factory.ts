@@ -15,21 +15,26 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
+class Factory {
+    memory: FactoryMemory
 
-    _.forEach(groups)
-}
+    factory: StructureFactory
 
-var loadCommands = () => {
-    //TODO
-}
 
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+    run(): void {
+        var description: productDescription = COMMODITIES[this.memory.product]
+        if (!description) return;
+
+        this.produce(description);
+    }
+
+    produce(description: productDescription): void {
+        if (!this.checkRawMaterial(description) || this.factory.cooldown) return;
+
+        this.factory.produce(this.memory.product);
+    }
+
+    checkRawMaterial(description: productDescription): boolean {
+        return _.every(description.components, (number, rawMaterial) => this.factory.store[rawMaterial] >= number);
     }
 }

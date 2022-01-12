@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -99,30 +100,33 @@ function boost(creep: Creep, lab: StructureLab): boolean {
     return true;
 }
 
-export abstract class Team {
-    memory: TeamMemory
+abstract class Team extends AbstractMemorial<TeamMemory> implements ControlUnit {
+    memory: TeamMemory;
 
-    name: string
-    type: TeamType
-    creeps: {
-        [name: string]: Creep
-    }
-    spawner: StructureSpawn
-    room: Room
+    name: string;
+    type: TeamType;
+    creeps: Record<string, Creep>;
+    spawner: StructureSpawn;
+    room: Room;
 
-    protected roleBehaviors: Record<Role, RoleBehavior> = roleBehaviors
-    protected tasks: Record<TaskType, TaskExcutor> = tasks
+    protected roleBehaviors: Record<Role, RoleBehavior> = roleBehaviors;
+    protected tasks: Record<TaskType, TaskExcutor> = tasks;
 
     constructor(memory: TeamMemory) {
-        this.memory = memory;
+        super(memory);
 
         this.name = memory.name;
+        this.type = memory.type;
         this.spawner = Game.spawns[memory.spawner];
         this.room = Game.rooms[memory.room];
         this.creeps = {}
-        _.forEach(memory.creeps, (description, name) => {
-            this.creeps[name] = Game.creeps[description.alive];
-        });
+        _.forEach(memory.creeps, (description, name) =>
+            this.creeps[name] = Game.creeps[description.alive]
+        );
+    }
+
+    process(): void {
+        throw new Error('Method not implemented.');
     }
 
     run(): void {
@@ -233,3 +237,5 @@ export abstract class Team {
      */
     abstract update(): void
 }
+
+export type { Team };

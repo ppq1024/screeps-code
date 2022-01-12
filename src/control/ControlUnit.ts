@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,36 +16,19 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface Memory {
-    home: string
-    staticTask: { [name: string]: Task }
-    links: LinkTask[]
-    teams: {
-        [name: string]: TeamMemory
-    }
-    stats: Stats
-}
+/**
+ * 控制单元绝大多数逻辑执行的基本单位，它隐藏了内部的逻辑并暴露入口函数，
+ * 在每个tick都会执行
+ */
+interface ControlUnit {
 
-interface CreepMemory {
-    station?: WorkStation
-}
+    /**
+     * 控制单元自身逻辑的处理，不包括下级单元
+     */
+    process(): void;
 
-interface SpawnMemory {
-    priorQueue: SpawnRequest[]
-    queue: SpawnRequest[]
-}
-
-interface TeamMemory {
-    name: string
-    type: TeamType
-    inited?: boolean
-    room?: string
-    spawner: string
-    creeps: {
-        [name: string]: CreepDescription
-    }
-}
-
-interface LabMemory {
-    
+    /**
+     * 控制单元每个tick执行的任务
+     */
+    run(): void;
 }

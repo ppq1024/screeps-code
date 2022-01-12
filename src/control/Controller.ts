@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ *
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,21 +16,26 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function loadGroupsFromMemory() {
-    Game.groups = {};
-    var groups = Memory.groups;
-    if (!groups) groups = Memory.groups = {};
+/**
+ * 三级控制单元，一般对应单一的游戏对象，但有时也对应联合行动的多个游戏对象，如四人小队等
+ */
+abstract class Controller<O extends RoomObject, D extends Description<O>> implements ControlUnit {
 
-    _.forEach(groups)
-}
+    object: O;
+    description: D;
 
-var loadCommands = () => {
-    //TODO
-}
 
-export const command =  {
-    init: () => {
-        loadGroupsFromMemory();
-        loadCommands();
+    constructor(description: D) {
+        this.description = description;
+        this.object = this.getObject(this.description);
+    }
+    process(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    protected abstract getObject(description: D): O;
+
+    run(): void {
+
     }
 }
