@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -22,10 +23,12 @@ import { RoleBehavior } from '@/creep/role/RoleBehavior';
  * 资源回收
  */
 class RoleCleaner extends RoleBehavior {
-    run(creep: Creep, _description: CreepDescription, room?: Room): void {
+    run(creep: Creep, description: CreepDescription, room?: Room): void {
         room = room ? room : creep.room;
         var station = creep.memory.station;
-        if (!station) station = creep.memory.station = {}
+        if (!station) station = creep.memory.station = {};
+        var targetsID = description['targetsID'] as Id<AnyStoreStructure>[];
+        if (!targetsID) targetsID = description['targetsID'] = [];
 
         station.working = (station.working ? !creep.store.getFreeCapacity() : !creep.store.getUsedCapacity()) ?
                 !station.working : station.working;
@@ -34,6 +37,8 @@ class RoleCleaner extends RoleBehavior {
             this.store(creep, room);
             return;
         }
+
+        
 
         var target = Game.getObjectById(station['targetID'] as Id<Resource | Tombstone | Ruin>);
         if (!target || !(target instanceof Resource) && !(target as Tombstone | Ruin).store.getUsedCapacity()) {
@@ -59,19 +64,17 @@ class RoleCleaner extends RoleBehavior {
             return;
         }
     
-        if (room == Game.rooms.E24S53) {
-            var container = Game.getObjectById('61b36bc1b711e1750170f9e1' as Id<StructureContainer>);
-            if (container.store.getUsedCapacity() > 0) {
-                if (functions.moveTo(creep, container, 1)) {
-                    for (var resource in container.store) {
-                        if (creep.store.getFreeCapacity() == 0) break;
-                        creep.withdraw(container, resource as ResourceConstant);
-                    }
+        if(_.any(targetsID, (targetID) => {
+            var target = Game.getObjectById(targetID);
+            if (target.store.getUsedCapacity() > 1000) {
+                if (functions.moveTo(creep, target, 1)) {
+                    _.forEach(target.store, (_count, resource: ResourceConstant) => 
+                        creep.withdraw(target, resource))
                 }
-                
-                return;
+                return true;
             }
-        }
+            return false;
+        })) return;
     
         this.store(creep, room);
     }

@@ -16,24 +16,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { carrier } from '@/creep/role/carrier';
-import { RoleBehavior } from '@/creep/role/RoleBehavior';
-import { cleaner } from '@/creep/role/cleaner';
-import { supplier } from '@/creep/role/supplier';
 import { functions } from '@/creep/functions';
 import AbstractMemorial from '@/memory/AbstractMemorial';
-
-const roleBehaviors: Record<Role, RoleBehavior> = {
-    harvester: undefined,
-    carrier: carrier,
-    builder: undefined,
-    upgrader: undefined,
-    cleaner: cleaner,
-    supplier: supplier,
-    worker: undefined,
-    claimer: undefined,//不同地方可能不太一样
-    observer: undefined
-}
 
 function boost(creep: Creep, lab: StructureLab): boolean {
     if (lab.store[lab.mineralType] < 30) return false; //没有东西就不要强化了好吧
