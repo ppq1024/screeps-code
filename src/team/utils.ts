@@ -16,8 +16,6 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { develop } from "@/develop/Utils";
-
 export const bodyParts = {
     workerUnit: [WORK, CARRY, MOVE],
     workerUnitCost: 200,
@@ -44,12 +42,15 @@ export function getBodyparts(unit: BodyPartConstant[], unitCost: number, costMax
     return bodyparts;
 }
 
-export const teamTypes: Record<GroupType, Record<TeamType, TeamConstructor>> = {
-    develop: develop.teamTypes,
-    expansion: undefined,
-    industry: undefined,
-    army: undefined,
-    power: undefined
+export const teamMemoryInit: MemoryInit<TeamMemory> =  {
+    create(name: string, type: TeamType, spawner: string, ...opts: any): TeamMemory {
+        return {
+            name: name,
+            type: type,
+            spawner: spawner,
+            creeps: {}
+        }
+    }
 }
 
 // const roleBodyparts: Record<Role, (costMax: number) => BodyPartConstant[]> = {

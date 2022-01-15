@@ -16,7 +16,7 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Group from '@/control/Group'
+import Group from '@/group/Group'
 
 class Develop extends Group {
     process(): void {

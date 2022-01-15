@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,19 +16,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Team } from '@/team/Team'
+import Group from '@/group/Group'
 
-export class Outer extends Team {
-    init(): boolean {
-        //TODO
-        return this.memory.inited = true;
+class Expansion extends Group {
+    process(): void {
+        //Do nothing
     }
-
-    checkUpdate(): boolean {
-        return false;
-    }
-
-    update(): void {
-        throw new Error('Method not implemented.');
-    }
+    
 }
+
+export default Expansion;

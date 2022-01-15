@@ -21,7 +21,7 @@ import { carrier } from '@/creep/role/carrier';
 import { cleaner } from '@/creep/role/cleaner';
 import { supplier } from '@/creep/role/supplier';
 import Team from '@/team/Team'
-import { bodyParts, getBodyparts } from '@/team/Utils';
+import { bodyParts, getBodyparts } from '@/team/utils';
 
 const roleBehaviors = {
     carrier: carrier,
@@ -32,19 +32,6 @@ const roleBehaviors = {
 class Transport extends Team {
 
     doTask(creep: Creep, description: CreepDescription, room?: Room): void {
-        //这里有个问题，原carrier, supplier和cleaner都在这边搞
-        // var resource = description['resource'];
-        // var station = functions.check.checkStation(creep, resource);
-        // var source = Game.getObjectById(description['sourceID'] as Id<AnyStoreStructure>);
-        // var target = Game.getObjectById(description['targetID'] as Id<AnyStoreStructure>);
-        // if (target.store.getFreeCapacity(resource) == 0) {
-        //     return;
-        // }
-        // target = station.working ? target : source;
-        // if (functions.moveTo(creep, target, 1)) {
-        //     station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
-        // }
-
         roleBehaviors[description.role].run(creep, description, room);
     }
 

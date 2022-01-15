@@ -17,8 +17,8 @@
  */
 
 import AbstractMemorial from '@/memory/AbstractMemorial';
-import { structureGroupTypes } from '@/structures/Utils';
-import { teamTypes } from '@/team/Utils';
+import { structureGroupTypes } from '@/structures/utils';
+import { teamTypes } from '@/team/teamTypes';
 
 /**
  * 一级控制单元
@@ -33,6 +33,7 @@ abstract class Group extends AbstractMemorial<GroupMemory> implements ControlUni
     
     name: string;
     type: GroupType;
+    room: string;
     teams: Record<string, Team>;
     structureGroups: Record<string, StructureGroup>;
 
@@ -40,6 +41,7 @@ abstract class Group extends AbstractMemorial<GroupMemory> implements ControlUni
         super(memory);
         this.name = this.memory.name;
         this.type = this.memory.type;
+        this.room = this.memory.room;
         this.teams = {};
         this.structureGroups = {};
         _.forEach(this.memory.teams, (memory, name) =>

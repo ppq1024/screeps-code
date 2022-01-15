@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,15 +16,21 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Team } from '@/team/Team'
+import { groupMemoryInit } from "@/group/utils";
+import Construct from "@/team/Construct";
+import Exploit from "@/team/Exploit";
+import Transport from "@/team/Transport";
+import Upgrade from "@/team/Upgrade";
+import Work from "@/team/Work";
 
-export class Roomer extends Team {
-
-    checkUpdate(): boolean {
-        return false;
-    }
-
-    update(): void {
-        
-    }
+export const develop: GroupDescription = {
+    teamTypes: {
+        exploit: Exploit,
+        construct: Construct,
+        transport: Transport,
+        upgrade: Upgrade,
+        work: Work
+    },
+    structureTypes: undefined,
+    memoryInit: groupMemoryInit
 }

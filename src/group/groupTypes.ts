@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,8 +16,23 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const teamController = {
-    run: () => {
-        _.forEach(Game.teams, (team) => team.run());
-    }
+import Develop from "@/develop/Develop";
+import { develop } from "@/develop/utils";
+import Expansion from "@/expansion/Expansion";
+import { expansion } from "@/expansion/utils";
+
+export const groupTypes: Record<GroupType, GroupConstructor> = {
+    develop: Develop,
+    expansion: Expansion,
+    industry: undefined,
+    army: undefined,
+    power: undefined
+}
+
+export const groupMemoryInits: Record<GroupType, MemoryInit<GroupMemory>> = {
+    develop: develop.memoryInit,
+    expansion: expansion.memoryInit,
+    industry: undefined,
+    army: undefined,
+    power: undefined
 }

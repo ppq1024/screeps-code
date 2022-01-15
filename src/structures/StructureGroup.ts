@@ -16,6 +16,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import AbstractMemorial from "@/memory/AbstractMemorial";
+
 /**
  * 
  */
@@ -35,3 +37,5 @@ abstract class StructureGroup extends AbstractMemorial<StructureGroupMemory> imp
     
     abstract run(): void;
 }
+
+export default StructureGroup;

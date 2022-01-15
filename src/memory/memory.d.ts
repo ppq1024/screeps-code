@@ -41,9 +41,14 @@ interface MemorialConstructor<M extends Memorial<U>, U extends MemoryUnit<M>> {
     new (memory: U, opt?: any): M;
 }
 
+interface MemoryInit<U extends MemoryUnit<any>> {
+    create(name: string, ...opts: any): U
+}
+
 interface GroupMemory extends MemoryUnit<Group> {
     name: string
     type: GroupType
+    room: string
     teams: Record<string, TeamMemory>
     structureGroups: Record<string, StructureGroupMemory>
 }

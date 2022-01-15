@@ -71,6 +71,7 @@ interface Group {
     memory: GroupMemory
     name: string
     type: GroupType
+    room: string
     teams: Record<string, Team>
     structureGroups: Record<string, StructureGroup>
 
@@ -81,7 +82,7 @@ interface Group {
 interface GroupDescription {
     teamTypes: Record<TeamType, TeamConstructor>
     structureTypes: Record<StructureGroupType, StructureGroupConstructor>
-    groupMemoryInit: (name: string, opts?: any) => GroupMemory
+    memoryInit: MemoryInit<GroupMemory>
 }
 
 interface Team {
@@ -91,6 +92,11 @@ interface Team {
     creeps: Record<string, Creep>
     defaultSpawn: StructureSpawn
     room: Room
+    run(): void
+}
+
+interface StructureGroup {
+    memory: StructureGroupMemory
     run(): void
 }
 

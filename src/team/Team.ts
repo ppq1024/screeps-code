@@ -75,7 +75,7 @@ abstract class Team extends AbstractMemorial<TeamMemory> implements ControlUnit 
 
             this.preDo(creep);
     
-            this.doTask(creep, description);
+            this.doTask(creep, description, Game.rooms[this.group.room]);
         });
         this.spawn();
     }

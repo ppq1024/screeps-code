@@ -16,20 +16,12 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Develop from "@/develop/Develop";
-import { develop } from "@/develop/Utils";
+import { develop } from "@/develop/utils";
+import { expansion } from "@/expansion/utils";
 
-export const groupTypes: Record<GroupType, GroupConstructor> = {
-    develop: Develop,
-    expansion: undefined,
-    industry: undefined,
-    army: undefined,
-    power: undefined
-}
-
-export const groupMemoryInit: Record<GroupType, (name: string, opts?: any) => GroupMemory> = {
-    develop: develop.groupMemoryInit,
-    expansion: undefined,
+export const teamTypes: Record<GroupType, Record<TeamType, TeamConstructor>> = {
+    develop: develop.teamTypes,
+    expansion: expansion.teamTypes,
     industry: undefined,
     army: undefined,
     power: undefined
