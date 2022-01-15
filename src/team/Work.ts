@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,13 +17,12 @@
  */
 
 import { functions } from '@/creep/functions';
-import { RoleBehavior } from '@/creep/role/RoleBehavior';
+import Team from '@/team/Team'
+import { bodyParts, getBodyparts } from '@/team/Utils';
 
-/**
- * 用于前期工作
- */
-class RoleWorker extends RoleBehavior {
-    run(creep: Creep, description: CreepDescription, room?: Room): void {
+class Work extends Team {
+
+    doTask(creep: Creep, description: CreepDescription, room?: Room): void {
         var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
         room = room ? room : creep.room;
     
@@ -53,6 +53,12 @@ class RoleWorker extends RoleBehavior {
     
         functions.rawHarvest(creep);
     }
+
+    getBodyparts(costMax?: number): BodyPartConstant[] {
+        costMax = costMax ? costMax : this.defaultSpawn.room.energyCapacityAvailable;
+        return getBodyparts(bodyParts.workerUnit, bodyParts.workerUnitCost, costMax);
+    }
+    
 }
 
-export const worker = new RoleWorker();
+export default Work;

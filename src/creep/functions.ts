@@ -67,8 +67,8 @@ export const functions = {
          *     通常只有所有指定类型的建筑都充满能量才会执行失败
          */
         supply(creep: Creep, ...type: StructureConstant[]): boolean {
-            if (!creep.memory.station.target) creep.memory.station.target = {type: undefined}
-            var target = functions.check.checkTarget(creep.memory.station.target, creep.pos, ...type);
+            if (!creep.memory.station['target']) creep.memory.station['target'] = {type: undefined}
+            var target = functions.check.checkTarget(creep.memory.station['target'], creep.pos, ...type);
             if (target) {
                 if (functions.moveTo(creep, target, 1)) {
                     var result = creep.transfer(target, RESOURCE_ENERGY)
@@ -137,9 +137,9 @@ export const functions = {
                 var target = pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure: AnyStoreStructure) => type.includes(structure.structureType) &&
                             structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                });
+                }) as AnyStoreStructure;
                 structureTarget.type = target ? target.structureType : undefined;
-                structureTarget.description = target ? target.id : undefined;
+                structureTarget.id = target ? target.id: undefined;
             }
     
             return functions.getTarget(structureTarget);
@@ -153,9 +153,8 @@ export const functions = {
      * @param target StructureTarget对象
      * @returns 对应的AnyStoreStructure对象，或undefined
      */
-    getTarget: (target: StructureTarget) => target && target.type ? target.type == STRUCTURE_STORAGE ?
-        Game.rooms[target.description].storage :
-        Game.getObjectById(target.description as Id<AnyStoreStructure>) : undefined,
+    getTarget: (target: StructureTarget) => target && target.type ?
+        Game.getObjectById(target.id) : undefined,
     
     /**
      * 向指定目标移动Creep
@@ -199,7 +198,10 @@ var freshWallTarget = (creep: Creep) => {
     var station = creep.memory.station;
     var lastFresh = station['lastFresh'] as number;
     lastFresh = lastFresh ? lastFresh : 0;
-    if ((Game.time - lastFresh > 0x100) || !station['targetID']) {
+
+    var target = Game.getObjectById(station['targetID'] as Id<StructureWall | StructureRampart>);
+    if ((Game.time - lastFresh > 0x100) || !target ||
+        !(target instanceof StructureWall) && !(target instanceof StructureRampart)) {
         var targets = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => (structure.structureType == STRUCTURE_WALL ||
                     structure.structureType == STRUCTURE_RAMPART) &&
@@ -215,7 +217,7 @@ var freshWallTarget = (creep: Creep) => {
         station['lastFresh'] = Game.time;
         return hitsMin;
     }
-    return Game.getObjectById(station['targetID'] as Id<StructureWall | StructureRampart>);
+    return target;
 }
 
 var repairTarget = (creep: Creep) => {

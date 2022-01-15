@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -18,6 +19,7 @@
 interface Game {
     teams: {[name: string]: Team}
     groups: Record<string, Group>
+    functions: Record<string, Function>
 }
 
 interface WorkStation {
@@ -60,6 +62,11 @@ interface RoleBehavior {
     run(creep: Creep): void
 }
 
+interface StructureTarget {
+    type: StructureConstant
+    id: Id<AnyStoreStructure>
+}
+
 interface Group {
     memory: GroupMemory
     name: string
@@ -71,25 +78,27 @@ interface Group {
     run(): void
 }
 
+interface GroupDescription {
+    teamTypes: Record<TeamType, TeamConstructor>
+    structureTypes: Record<StructureGroupType, StructureGroupConstructor>
+    groupMemoryInit: (name: string, opts?: any) => GroupMemory
+}
+
 interface Team {
     memory: TeamMemory
     name: string
     type: TeamType
     creeps: Record<string, Creep>
-    spawner: StructureSpawn
+    defaultSpawn: StructureSpawn
     room: Room
-    roleBehaviors: Record<Role, RoleBehavior>
     run(): void
 }
 
-interface Description<O> {}
-
-interface CreepDescription extends Description<Creep> {
+interface CreepDescription {
     name: string
     role: Role
     alive: string
     body: BodyPartConstant[]
-    task?: Task
     autoRespawn?: boolean
     respawned?: boolean
     important?: boolean
@@ -98,13 +107,13 @@ interface CreepDescription extends Description<Creep> {
     spawner?: string
 }
 
-interface StructureDescription extends Description<Structure> {
+interface StructureDescription {
 
 }
 
-interface TeamConstructor extends MemorialConstructor<Team, TeamMemory> {}
-
-interface StructureGroupConstructor extends MemorialConstructor<StructureGroup, StructureGroupMemory> {}
+interface StructureGroupConstructor {
+    new (memory: StructureGroupMemory, group: Group): StructureGroup
+}
 
 interface LinkTask {
     sourceID: Id<StructureLink>
@@ -112,12 +121,14 @@ interface LinkTask {
     emptyOnly: boolean
 }
 
-
-
-interface productDescription {
+interface ProductDescription {
     level?: number
     amount: number
     cooldown: number
     components: Record<RawMaterial, number>
 }
 
+interface ExploitPoint {
+    targetID: Id<ExploitTarget>
+    position: RoomPosition
+}

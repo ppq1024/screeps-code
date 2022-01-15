@@ -18,6 +18,7 @@
 
 interface Memory {
     groups: Record<string, GroupMemory>
+    links: LinkTask[]
     stats: Stats
 }
 
@@ -37,7 +38,7 @@ interface Memorial<U extends MemoryUnit<any>> {
 interface MemoryUnit<M extends Memorial<any>> {}
 
 interface MemorialConstructor<M extends Memorial<U>, U extends MemoryUnit<M>> {
-    new (memory: U): M;
+    new (memory: U, opt?: any): M;
 }
 
 interface GroupMemory extends MemoryUnit<Group> {
@@ -58,6 +59,6 @@ interface TeamMemory extends MemoryUnit<Team> {
 
 interface StructureGroupMemory extends MemoryUnit<StructureGroup> {
     name: string
-    type: StructureType
+    type: StructureGroupType
     structures: Record<string, StructureDescription>
 }

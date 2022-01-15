@@ -16,10 +16,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const teamTypes: Record<GroupType, Record<string, TeamConstructor>> = {
-    develop: undefined,
-    expansion: undefined,
-    industry: undefined,
-    army: undefined,
-    power: undefined
+import Group from '@/control/Group'
+
+class Develop extends Group {
+    process(): void {
+        //Do nothing
+    }
+    
 }
+
+export default Develop;

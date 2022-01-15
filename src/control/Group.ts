@@ -16,8 +16,9 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { structureGroupTypes } from '@/structures/StructureGroupTypes';
-import { teamTypes } from '@/team/TeamTypes'
+import AbstractMemorial from '@/memory/AbstractMemorial';
+import { structureGroupTypes } from '@/structures/Utils';
+import { teamTypes } from '@/team/Utils';
 
 /**
  * 一级控制单元
@@ -39,10 +40,12 @@ abstract class Group extends AbstractMemorial<GroupMemory> implements ControlUni
         super(memory);
         this.name = this.memory.name;
         this.type = this.memory.type;
+        this.teams = {};
+        this.structureGroups = {};
         _.forEach(this.memory.teams, (memory, name) =>
-            this.teams[name] = new teamTypes[this.memory.type][memory.type](memory));
+            this.teams[name] = new teamTypes[this.memory.type][memory.type](memory, this));
         _.forEach(this.memory.structureGroups, (memory, name) =>
-            this.structureGroups[name] = new structureGroupTypes[this.memory.type][memory.type](memory));
+            this.structureGroups[name] = new structureGroupTypes[this.memory.type][memory.type](memory, this));
     }
 
     abstract process(): void;
@@ -53,3 +56,5 @@ abstract class Group extends AbstractMemorial<GroupMemory> implements ControlUni
         _.forEach(this.structureGroups, (structureGroup) => structureGroup.run());
     }
 }
+
+export default Group;

@@ -19,7 +19,7 @@
 /**
  * 三级控制单元，一般对应单一的游戏对象，但有时也对应联合行动的多个游戏对象，如四人小队等
  */
-abstract class Controller<O extends RoomObject, D extends Description<O>> implements ControlUnit {
+abstract class Controller<O extends RoomObject, D> implements ControlUnit {
 
     object: O;
     description: D;
@@ -39,3 +39,5 @@ abstract class Controller<O extends RoomObject, D extends Description<O>> implem
 
     }
 }
+
+export default Controller;

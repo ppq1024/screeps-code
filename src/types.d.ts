@@ -17,11 +17,13 @@
  */
 
 type GroupType = 'develop' | 'expansion' | 'industry' | 'army' | 'power'
-type TeamType = 'roomer' | 'outer' | 'immigrant'
-type StructureType = 'spawn' | 'tower' | 'store' | 'terminal' | 'link' | 'lab' | 'factory'
+// type TeamType = 'roomer' | 'outer' | 'immigrant'
+type TeamType = 'exploit' | 'construct' | 'transport' | 'upgrade' | 'work'
+type StructureGroupType = 'spawn' | 'tower' | 'store' | 'terminal' | 'link' | 'lab' | 'factory'
 type TaskType = 'harvest' | 'carry' | 'observe'
 type Role = 'harvester' | 'builder' | 'carrier' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner' | 'supplier'
 
+type ExploitTarget = Source | Mineral | Deposit
 
 type Product = CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY
 type RawMaterial = CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY | DepositConstant

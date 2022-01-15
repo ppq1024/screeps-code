@@ -19,9 +19,15 @@
 import { errorMapper } from '@/modules/errorMapper';
 import { exportStats } from '@/modules/stats'
 import { command } from '@/command';
+import { spawner } from '@/spawner';
+import { tower } from '@/tower';
+import { link } from '@/link';
 
 var loopUnit = () => {
     command.init();
+    spawner.run();
+    tower.run();
+    link.run();
     _.forEach(Game.groups, (group) => group.run());
     
 
@@ -45,3 +51,4 @@ var loopUnit = () => {
 }
 
 export const loop = errorMapper(loopUnit);
+// export const loop = loopUnit;

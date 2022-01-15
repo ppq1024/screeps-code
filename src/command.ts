@@ -15,15 +15,27 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { groupTypes, groupMemoryInit } from "./control/GroupTypes";
+
 function loadGroupsFromMemory() {
     Game.groups = {};
     var groups = Memory.groups;
     if (!groups) groups = Memory.groups = {};
 
-    _.forEach(groups)
+    _.forEach(groups, (memory, name) => Game.groups[name] = new groupTypes[memory.type](memory));
 }
 
 var loadCommands = () => {
+    Game.functions = {}
+    Game.functions.createGroup = (name: string, opts?: any): boolean => {
+        if (Memory.groups[name]) {
+            console.log('This group already exists.');
+            return false;
+        }
+
+        Memory.groups[name] = groupMemoryInit[opts.type](name, opts);
+        return true;
+    }
     //TODO
 }
 
