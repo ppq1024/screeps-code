@@ -16,22 +16,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { teamMemoryInit } from "@/team/utils";
+import Group from '@/group/Group'
 
-export const groupMemoryInit: MemoryInit<GroupMemory> = {
-    create(name: string, type: GroupType, room: string, ...opts: any): GroupMemory {
-        return {
-            name: name,
-            type: type,
-            room: room,
-            teams: {
-                exploit: teamMemoryInit.create('exploit', 'exploit', ...opts),
-                transport: teamMemoryInit.create('transport', 'transport', ...opts),
-                construct: teamMemoryInit.create('construct', 'construct', ...opts),
-                upgrade: teamMemoryInit.create('upgrade', 'upgrade', ...opts),
-                work: teamMemoryInit.create('work', 'work', ...opts),
-            },
-            structureGroups: {}
-        }
+class Industry extends Group {
+    process(): void {
+        //Do nothing
     }
+    
 }
+
+export default Industry;
