@@ -131,7 +131,7 @@ abstract class Team extends AbstractMemorial<TeamMemory> implements ControlUnit 
     deleteCreep(name: string): boolean {
         var description = this.memory.creeps[name];
         if (!description) return false;
-        var creepName = this.name + '_' + description.role + '_' + name;
+        var creepName = this.group.name + '_' + this.name + '_' + name;
         var creep = this.creeps[name];
         if (creep) creep.suicide();
         delete this.memory.creeps[name];

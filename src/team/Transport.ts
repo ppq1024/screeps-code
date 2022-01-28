@@ -16,7 +16,6 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from '@/creep/functions';
 import { carrier } from '@/creep/role/carrier';
 import { cleaner } from '@/creep/role/cleaner';
 import { supplier } from '@/creep/role/supplier';
