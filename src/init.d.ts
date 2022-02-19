@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -17,11 +18,12 @@
 
 interface Game {
     teams: {[name: string]: Team}
+    groups: Record<string, Group>
+    functions: Record<string, Function>
 }
 
 interface WorkStation {
     working?: boolean
-    target?: StructureTarget
 }
 
 interface SpawnRequest {
@@ -56,15 +58,45 @@ interface RoomStats {
     controllerLevel: number
 }
 
+interface RoleBehavior {
+    run(creep: Creep): void
+}
+
+interface StructureTarget {
+    type: StructureConstant
+    id: Id<AnyStoreStructure>
+}
+
+interface Group {
+    memory: GroupMemory
+    name: string
+    type: GroupType
+    room: string
+    teams: Record<string, Team>
+    structureGroups: Record<string, StructureGroup>
+
+    process(): void
+    run(): void
+}
+
+interface GroupDescription {
+    teamTypes: Record<TeamType, TeamConstructor>
+    structureTypes: Record<StructureGroupType, StructureGroupConstructor>
+    memoryInit: MemoryInit<GroupMemory>
+}
+
 interface Team {
     memory: TeamMemory
     name: string
     type: TeamType
-    creeps: {
-        [name: string]: Creep
-    }
-    spawner: StructureSpawn
+    creeps: Record<string, Creep>
+    defaultSpawn: StructureSpawn
     room: Room
+    run(): void
+}
+
+interface StructureGroup {
+    memory: StructureGroupMemory
     run(): void
 }
 
@@ -73,7 +105,6 @@ interface CreepDescription {
     role: Role
     alive: string
     body: BodyPartConstant[]
-    task?: Task
     autoRespawn?: boolean
     respawned?: boolean
     important?: boolean
@@ -82,29 +113,28 @@ interface CreepDescription {
     spawner?: string
 }
 
-type TeamType = 'roomer' | 'outer' | 'immigrant'
-type TaskType = 'harvest' | 'carry' | 'observe'
-type Role = 'harvester' | 'builder' | 'carrier' | 'upgrader' | 'observer' | 'worker' | 'claimer' | 'cleaner' | 'supplier'
+interface StructureDescription {
 
-interface StructureTarget {
-    type: StructureConstant
-    description?: string
-    flag?: string
 }
 
-interface WorkerTask extends Task {
-    name: string
-    source: Source | Mineral | Deposit | Structure
-    target: Structure | ConstructionSite | Creep
-}
-
-interface BodyUnit {
-    unit: BodyPartConstant[]
-    repeat: number
+interface StructureGroupConstructor {
+    new (memory: StructureGroupMemory, group: Group): StructureGroup
 }
 
 interface LinkTask {
     sourceID: Id<StructureLink>
     targetID: Id<StructureLink>
     emptyOnly: boolean
+}
+
+interface ProductDescription {
+    level?: number
+    amount: number
+    cooldown: number
+    components: Record<RawMaterial, number>
+}
+
+interface ExploitPoint {
+    targetID: Id<ExploitTarget>
+    position: RoomPosition
 }

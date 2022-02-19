@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,16 +16,14 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from '@/creep/functions';
-import { TaskExcutor } from '@/creep/task/TaskExcutor';
-
-var run = (creep: Creep, task: CarryTask) => {
-    var resource = task.resource;
-    var station = functions.check.checkStation(creep, resource);
-    var target = functions.getTarget(station.working ? task.to : task.from);
-    if (functions.moveTo(creep, target, 1)) {
-        station.working ? creep.transfer(target, resource) : creep.withdraw(target, resource);
+/**
+ * 
+ */
+abstract class AbstractMemorial<U extends MemoryUnit<any>> implements Memorial<U> {
+    memory: U;
+    constructor(memory: U) {
+        this.memory = memory;
     }
 }
 
-export const carry = new TaskExcutor(run);
+export default AbstractMemorial;

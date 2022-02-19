@@ -5,6 +5,6 @@ gulp.task('typedoc', () =>
     gulp.src(['src/**/*.ts'])
         .pipe(typedoc({
             out: 'doc/',
-            name: 'unnamed'
+            name: 'Document'
         }))
 )

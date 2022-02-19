@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,12 +16,11 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export class TaskExcutor {
-    constructor(
-        run: (creep: Creep, task: Task) => void
-    ) {
-        this.run = run;
-    }
+import StructureGroup from "@/structures/StructureGroup";
 
-    run: (creep: Creep, task: Task) => void
+class LinkGroup extends StructureGroup {
+    run(): void {
+        throw new Error("Method not implemented.");
+    }
 }
+    

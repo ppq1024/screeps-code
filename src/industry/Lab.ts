@@ -15,18 +15,6 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const market = {
-    run() {
-        // var terminal = Game.rooms.E24S53.terminal;
-        // var energyOrder = Game.market.getOrderById('61c29aa6145569c2dac0c14f');
-        // if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
-        //     Game.market.extendOrder(energyOrder.id, 50000);
-        // }
-    
-        // var terminal = Game.rooms.E23S52.terminal;
-        // var energyOrder = Game.market.getOrderById('61c2cb6e1455693a7ad10818');
-        // if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
-        //     Game.market.extendOrder(energyOrder.id, 50000);
-        // }
-    }
+class Lab {
+    memory: LabMemory
 }

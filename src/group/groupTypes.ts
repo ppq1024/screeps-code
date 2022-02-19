@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,18 +16,25 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const market = {
-    run() {
-        // var terminal = Game.rooms.E24S53.terminal;
-        // var energyOrder = Game.market.getOrderById('61c29aa6145569c2dac0c14f');
-        // if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
-        //     Game.market.extendOrder(energyOrder.id, 50000);
-        // }
-    
-        // var terminal = Game.rooms.E23S52.terminal;
-        // var energyOrder = Game.market.getOrderById('61c2cb6e1455693a7ad10818');
-        // if (terminal.store.energy < 100000 && energyOrder.remainingAmount < 50000) {
-        //     Game.market.extendOrder(energyOrder.id, 50000);
-        // }
-    }
+import Army from "@/army/Army";
+import { army } from "@/army/utils";
+import Develop from "@/develop/Develop";
+import { develop } from "@/develop/utils";
+import Expansion from "@/expansion/Expansion";
+import { expansion } from "@/expansion/utils";
+
+export const groupTypes: Record<GroupType, GroupConstructor> = {
+    develop: Develop,
+    expansion: Expansion,
+    industry: undefined,
+    army: Army,
+    power: undefined
+}
+
+export const groupMemoryInits: Record<GroupType, MemoryInit<GroupMemory>> = {
+    develop: develop.memoryInit,
+    expansion: expansion.memoryInit,
+    industry: undefined,
+    army: army.memoryInit,
+    power: undefined
 }

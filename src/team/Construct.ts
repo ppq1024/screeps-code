@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,15 +17,12 @@
  */
 
 import { functions } from '@/creep/functions';
-import { RoleBehavior } from '@/creep/role/RoleBehavior';
+import Team from '@/team/Team'
+import { bodyParts, getBodyparts } from '@/team/utils';
 
+class Construct extends Team {
 
-
-/**
- * 建筑、前期维修和刷墙
- */
-class RoleBuilder extends RoleBehavior {
-    run(creep: Creep, description: CreepDescription, room?: Room): void {
+    doTask(creep: Creep, description: CreepDescription, room?: Room): void {
         var station = functions.check.checkStation(creep, RESOURCE_ENERGY);
         room = room ? room : creep.room;
     
@@ -44,8 +42,14 @@ class RoleBuilder extends RoleBehavior {
             return;
         }
     
-        functions.preparation.getResource(creep, RESOURCE_ENERGY)
+        functions.preparation.getResource(creep, RESOURCE_ENERGY);
     }
+
+    getBodyparts(costMax?: number): BodyPartConstant[] {
+        costMax = costMax ? costMax : this.defaultSpawn.room.energyCapacityAvailable;
+        return getBodyparts(bodyParts.workerUnit, bodyParts.workerUnitCost, costMax);
+    }
+    
 }
 
-export const builder = new RoleBuilder();
+export default Construct;

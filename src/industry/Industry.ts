@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,27 +16,16 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface Task {
-    type: TaskType
-    roleLimit?: Role
+import Group from '@/group/Group'
+
+/**
+ * 
+ */
+class Industry extends Group {
+    process(): void {
+        //Do nothing
+    }
+    
 }
 
-interface CarryTask extends Task {
-    type: 'carry'
-    roleLimit: 'carrier'
-    resource: ResourceConstant
-    from?: StructureTarget
-    to?: StructureTarget
-}
-
-interface HarvestTask extends Task {
-    type: 'harvest'
-    roleLimit: 'harvester'
-    sourceID: string
-    target: StructureTarget
-}
-
-interface ObserveTask extends Task {
-    type: 'observe'
-    flag: string
-}
+export default Industry;

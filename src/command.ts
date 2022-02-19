@@ -15,34 +15,56 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Team } from "@/team/Team"
-import { Roomer } from "@/team/Roomer";
-import { Immigrant } from "@/team/Immigrant";
-import { Outer } from "@/team/Outer";
+import { groupTypes, groupMemoryInits } from "./group/groupTypes";
 
-var teamTypes: {[name: string]: {new (memory: TeamMemory): Team}} = {
-    roomer: Roomer,
-    immigrant: Immigrant,
-    outer: Outer
-}
+function loadGroupsFromMemory() {
+    Game.groups = {};
+    var groups = Memory.groups;
+    if (!groups) groups = Memory.groups = {};
 
-var loadTeamsFromMemory = () => {
-    Game.teams = {};
-    var teams = Memory.teams;
-    if (!teams) Memory.teams = {}
-
-    _.forEach(teams, (memory, name) => {
-        Game.teams[name] = new teamTypes[memory.type](memory);
-    })
+    _.forEach(groups, (memory, name) => Game.groups[name] = new groupTypes[memory.type](memory));
 }
 
 var loadCommands = () => {
+    Game.functions = {}
+    Game.functions.createGroup = createGroup;
     //TODO
 }
 
 export const command =  {
     init: () => {
-        loadTeamsFromMemory();
+        loadGroupsFromMemory();
         loadCommands();
     }
+}
+
+export function loadGroups() {
+    Game.groups = {};
+    var groups = Memory.groups;
+    if (!groups) groups = Memory.groups = {};
+
+    _.forEach(groups, (memory, name) => Game.groups[name] = new groupTypes[memory.type](memory));
+}
+
+/**
+ * 创建新的工作组
+ * 
+ * 此函数会创建并初始化组内存，在下一个tick会由加载器自动加载，
+ * 也可以手动调用loadGroups函数加载
+ * 
+ * @param name 组名称
+ * @param type 组类型，包括develop, expansion, industry, army, power
+ * @param room 工作房间名
+ * @param opts 其他可选参数，可能被忽略
+ * @returns 
+ * @see Group
+ */
+export function createGroup(name: string, type: GroupType, room: string, ...opts: any): boolean {
+    if (Memory.groups[name]) {
+        console.log('This group already exists.');
+        return false;
+    }
+
+    Memory.groups[name] = groupMemoryInits[type].create(name, type, room, ...opts);
+    return true;
 }

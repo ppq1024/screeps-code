@@ -1,4 +1,5 @@
-/*
+/* Copyright(c) PPQ, 2021-2022
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -15,15 +16,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Team } from '@/team/Team'
+import Group from "@/group/Group";
 
-export class Roomer extends Team {
+class Army extends Group {
 
-    checkUpdate(): boolean {
-        return false;
-    }
-
-    update(): void {
-        
+    process(): void {
+        //Do nothing
     }
 }
+
+export default Army;

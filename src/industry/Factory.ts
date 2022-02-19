@@ -15,26 +15,26 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { functions } from '@/creep/functions';
-import { TaskExcutor } from '@/creep/task/TaskExcutor';
+class Factory {
+    memory: FactoryMemory
 
-var run = (creep: Creep, task: HarvestTask) => {
-    var source = Game.getObjectById(<Id<Source>> task.sourceID);
-    var target = functions.getTarget(task.target);
+    factory: StructureFactory
 
-    if (creep.store.getFreeCapacity() == 0) {
-        if (!functions.moveTo(creep, target, 1)) {
-            return;
-        }
-        var result = creep.transfer(target, RESOURCE_ENERGY);
-        if (result == ERR_FULL) {
-            return;
-        }
+
+    run(): void {
+        var description: ProductDescription = COMMODITIES[this.memory.product]
+        if (!description) return;
+
+        this.produce(description);
     }
 
-    if (functions.moveTo(creep, source, 1)) {
-        creep.harvest(source);
+    produce(description: ProductDescription): void {
+        if (!this.checkRawMaterial(description) || this.factory.cooldown) return;
+
+        this.factory.produce(this.memory.product);
+    }
+
+    checkRawMaterial(description: ProductDescription): boolean {
+        return _.every(description.components, (number, rawMaterial) => this.factory.store[rawMaterial] >= number);
     }
 }
-
-export const harvest = new TaskExcutor(run);
