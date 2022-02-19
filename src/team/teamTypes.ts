@@ -16,6 +16,7 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { army } from "@/army/utils";
 import { develop } from "@/develop/utils";
 import { expansion } from "@/expansion/utils";
 
@@ -23,6 +24,6 @@ export const teamTypes: Record<GroupType, Record<TeamType, TeamConstructor>> = {
     develop: develop.teamTypes,
     expansion: expansion.teamTypes,
     industry: undefined,
-    army: undefined,
+    army: army.teamTypes,
     power: undefined
 }

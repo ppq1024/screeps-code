@@ -18,6 +18,9 @@
 
 import Group from '@/group/Group'
 
+/**
+ * 
+ */
 class Industry extends Group {
     process(): void {
         //Do nothing

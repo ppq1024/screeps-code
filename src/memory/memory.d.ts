@@ -67,3 +67,11 @@ interface StructureGroupMemory extends MemoryUnit<StructureGroup> {
     type: StructureGroupType
     structures: Record<string, StructureDescription>
 }
+
+interface FactoryMemory extends MemoryUnit<Factory> {
+    product: Product
+}
+
+interface LabMemory extends MemoryUnit<Lab> {
+    
+}

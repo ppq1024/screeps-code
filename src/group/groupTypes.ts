@@ -16,6 +16,8 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import Army from "@/army/Army";
+import { army } from "@/army/utils";
 import Develop from "@/develop/Develop";
 import { develop } from "@/develop/utils";
 import Expansion from "@/expansion/Expansion";
@@ -25,7 +27,7 @@ export const groupTypes: Record<GroupType, GroupConstructor> = {
     develop: Develop,
     expansion: Expansion,
     industry: undefined,
-    army: undefined,
+    army: Army,
     power: undefined
 }
 
@@ -33,6 +35,6 @@ export const groupMemoryInits: Record<GroupType, MemoryInit<GroupMemory>> = {
     develop: develop.memoryInit,
     expansion: expansion.memoryInit,
     industry: undefined,
-    army: undefined,
+    army: army.memoryInit,
     power: undefined
 }

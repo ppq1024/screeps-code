@@ -1,5 +1,5 @@
 /* Copyright(c) PPQ, 2021-2022
- *
+ * 
  * This file is part of PPQ's Screeps Code (ppq.screeps.code).
  *
  * ppq.screeps.code is free software: you can redistribute it and/or modify
@@ -16,28 +16,13 @@
  * along with ppq.screeps.code.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * 三级控制单元，一般对应单一的游戏对象，但有时也对应联合行动的多个游戏对象，如四人小队等
- */
-abstract class Controller<O extends RoomObject, D> implements ControlUnit {
+import Group from "@/group/Group";
 
-    object: O;
-    description: D;
+class Army extends Group {
 
-
-    constructor(description: D) {
-        this.description = description;
-        this.object = this.getObject(this.description);
-    }
     process(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    protected abstract getObject(description: D): O;
-
-    run(): void {
-
+        //Do nothing
     }
 }
 
-export default Controller;
+export default Army;

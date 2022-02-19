@@ -22,19 +22,19 @@ class Factory {
 
 
     run(): void {
-        var description: productDescription = COMMODITIES[this.memory.product]
+        var description: ProductDescription = COMMODITIES[this.memory.product]
         if (!description) return;
 
         this.produce(description);
     }
 
-    produce(description: productDescription): void {
+    produce(description: ProductDescription): void {
         if (!this.checkRawMaterial(description) || this.factory.cooldown) return;
 
         this.factory.produce(this.memory.product);
     }
 
-    checkRawMaterial(description: productDescription): boolean {
+    checkRawMaterial(description: ProductDescription): boolean {
         return _.every(description.components, (number, rawMaterial) => this.factory.store[rawMaterial] >= number);
     }
 }

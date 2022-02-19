@@ -17,7 +17,6 @@
  */
 
 type GroupType = 'develop' | 'expansion' | 'industry' | 'army' | 'power'
-// type TeamType = 'roomer' | 'outer' | 'immigrant'
 type TeamType = 'exploit' | 'construct' | 'transport' | 'upgrade' | 'work'
 type StructureGroupType = 'spawn' | 'tower' | 'store' | 'terminal' | 'link' | 'lab' | 'factory'
 type TaskType = 'harvest' | 'carry' | 'observe'
